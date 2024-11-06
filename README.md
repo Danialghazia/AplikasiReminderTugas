@@ -1,9 +1,9 @@
 Tugas Membuat Aplikasi 
 # Kelas A, Kelompok 9.
 Daftar Anggota Team:
-1. I0324006, Fadzli Fiyannuba, FadzliFiyannuba
-2. I0324018, Luthfia Amanda, Luthfia17
-3. I0324041, Danial Ghazi Arsyad, Danialghazia
+1. I0324006, Fadzli Fiyannuba, [FadzliFiyannuba](https://github.com/FadzliFiyannuba)
+2. I0324018, Luthfia Amanda, [Luthfia17](https://github.com/Luthfia17)
+3. I0324041, Danial Ghazi Arsyad, [Danialghazia](https://github.com/Danialghazia)
 
 Judul Tugas:
 Aplikasi Reminder Tugas 
