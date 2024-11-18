@@ -5,6 +5,97 @@ import json
 from tkcalendar import Calendar
 import threading
 import time
+import os
+
+class UserAuthApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("User  Authentication")
+        self.root.geometry("300x250")
+
+        self.users_file = "users.json"
+        self.load_users()
+
+        self.create_widgets()
+
+    def create_widgets(self):
+        self.tab_control = ttk.Notebook(self.root)
+
+        self.register_tab = ttk.Frame(self.tab_control)
+        self.login_tab = ttk.Frame(self.tab_control)
+
+        self.tab_control.add(self.register_tab, text='Register')
+        self.tab_control.add(self.login_tab, text='Login')
+        self.tab_control.pack(expand=1, fill='both')
+
+        self.create_register_widgets()
+        self.create_login_widgets()
+
+    def create_register_widgets(self):
+        ttk.Label(self.register_tab, text="Username:").grid(row=0, column=0, padx=10, pady=10)
+        self.reg_username = ttk.Entry(self.register_tab)
+        self.reg_username.grid(row=0, column=1, padx=10, pady=10)
+
+        ttk.Label(self.register_tab, text="Password:").grid(row=1, column=0, padx=10, pady=10)
+        self.reg_password = ttk.Entry(self.register_tab, show='*')
+        self.reg_password.grid(row=1, column=1, padx=10, pady=10)
+
+        ttk.Button(self.register_tab, text="Register", command=self.register_user).grid(row=2, columnspan=2, pady=10)
+
+    def create_login_widgets(self):
+        ttk.Label(self.login_tab, text="Username:").grid(row=0, column=0, padx=10, pady=10)
+        self.login_username = ttk.Entry(self.login_tab)
+        self.login_username.grid(row=0, column=1, padx=10, pady=10)
+
+        ttk.Label(self.login_tab, text="Password:").grid(row=1, column=0, padx=10, pady=10)
+        self.login_password = ttk.Entry(self.login_tab, show='*')
+        self.login_password.grid(row=1, column=1, padx=10, pady=10)
+
+        ttk.Button(self.login_tab, text="Login", command=self.login_user).grid(row=2, columnspan=2, pady=10)
+
+    def load_users(self):
+        if os.path.exists(self.users_file):
+            with open(self.users_file, 'r') as f:
+                self.users = json.load(f)
+        else:
+            self.users = {}
+
+    def save_users(self):
+        with open(self.users_file, 'w') as f:
+            json.dump(self.users, f)
+
+    def register_user(self):
+        username = self.reg_username.get()
+        password = self.reg_password.get()
+
+        if username in self.users:
+            messagebox.showerror("Error", "Username already exists!")
+            return
+
+        if not username or not password:
+            messagebox.showerror("Error", "Please fill in both fields!")
+            return
+
+        self.users[username] = password
+        self.save_users()
+        messagebox.showinfo("Success", "User  registered successfully!")
+        self.reg_username.delete(0, tk.END)
+        self.reg_password.delete(0, tk.END)
+
+    def login_user(self):
+        username = self.login_username.get()
+        password = self.login_password.get()
+
+        if username in self.users and self.users[username] == password:
+            messagebox.showinfo("Success", "Login successful!")
+            self.login_username.delete(0, tk.END)
+            self.login_password.delete(0, tk.END)
+            akar = tk.Tk()
+            AplikasiPengingatTugas(akar)
+            akar.mainloop()
+            
+        else:
+            messagebox.showerror("Error", "Invalid username or password!")
 
 class AplikasiPengingatTugas:
     def __init__(self, akar):
@@ -210,8 +301,8 @@ class AplikasiPengingatTugas:
                             f"Progress: {tugas['progress']}%"
                         )
             time.sleep(3600)  # Cek setiap jam
-
+    
 if __name__ == '__main__':
-    akar = tk.Tk()
-    aplikasi = AplikasiPengingatTugas(akar)
-    akar.mainloop()
+    root = tk.Tk()
+    app = UserAuthApp(root)
+    root.mainloop()
