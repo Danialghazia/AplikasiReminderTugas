@@ -19,4 +19,5 @@ Aplikasi yang berfungsi sebagai reminder tugas atau pekerjaan yang sedang atau a
 5. Aplikasi ini memungkinkan pengguna untuk mengupdate progress tugas dan memberikan deskripsi lanjutan (notes) pada tugas yang sudah dikerjakan.
 
 # Diagram Alir
-   
+![image](https://github.com/user-attachments/assets/c6d89ae7-83d5-487d-86bd-57750c9646b9)
+
