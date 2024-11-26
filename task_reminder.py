@@ -140,10 +140,10 @@ class AplikasiPengingatTugas:
 
         ttk.Label(bingkai_utama, text="Prioritas:", font=self.font_label).grid(row=4, column=0, pady=5, sticky='w')
         self.var_prioritas = tk.StringVar()
-        combo_prioritas = ttk.Combobox(bingkai_utama, textvariable=self.var_prioritas, font=self.font_entry)
-        combo_prioritas['values'] = ('Tinggi', 'Sedang', 'Rendah')
-        combo_prioritas.grid(row=4, column=1, pady=5)
-        combo_prioritas.set('Sedang')
+        self.combo_prioritas = ttk.Combobox(bingkai_utama, textvariable=self.var_prioritas, font=self.font_entry)
+        self.combo_prioritas['values'] = ('Tinggi', 'Sedang', 'Rendah')
+        self.combo_prioritas.grid(row=4, column=1, pady=5)
+        self.combo_prioritas.set('Sedang')
 
         ttk.Label(bingkai_utama, text="Progress (%):", font=self.font_label).grid(row=5, column=0, pady=5, sticky='w')
         self.var_progress = tk.StringVar(value="0")
@@ -185,19 +185,41 @@ class AplikasiPengingatTugas:
         matkul = self.entri_matkul.get()
         deskripsi = self.entri_deskripsi.get()
         tenggat = self.kalender.get_date()
-        prioritas = self.var_prioritas.get()
-        progress = self.var_progress.get()
-
-        if not all([matkul, deskripsi, tenggat, prioritas]):
-            messagebox.showerror("Error", "Semua field harus diisi!")
+        prioritas = self.combo_prioritas.get()  # Ambil nilai prioritas
+        progress = self.entri_progress.get()    # Ambil nilai progress
+        
+        try:
+            progress = int(progress)        
+        except ValueError:
+            messagebox.showerror("Error", "Progress harus berupa angka!")
             return
 
+        # Validasi: Tenggat waktu harus lebih dari hari ini
+        tanggal_sekarang = datetime.datetime.now().date()
+        tanggal_tenggat = datetime.datetime.strptime(tenggat, '%Y-%m-%d').date()
+
+        if tanggal_tenggat <= tanggal_sekarang:
+            messagebox.showerror("Error", "Tenggat waktu harus lebih dari hari ini!")
+            return
+
+        if not (0 <= progress <= 100):
+            messagebox.showerror("Error", "Progress harus antara 0 dan 100!")
+            return
+    
+        # Debugging nilai variabel
+        print(f"Matkul: {matkul}, Deskripsi: {deskripsi}, Tenggat: {tenggat}, Prioritas: {prioritas}, Progress: {progress}")
+
+        # Validasi: Semua field harus diisi
+        # if not all([matkul, deskripsi, tenggat, prioritas]):
+        #     messagebox.showerror("Error", "Semua field harus diisi!")
+        #     return
+
         tugas = {
-            'matkul': matkul,
-            'deskripsi': deskripsi,
+            'matkul': str(matkul),
+            'deskripsi': str(deskripsi),
             'tenggat': tenggat,
             'prioritas': prioritas,
-            'progress': progress
+            'progress': int(progress)
         }
 
         self.daftar_tugas.append(tugas)
@@ -215,13 +237,26 @@ class AplikasiPengingatTugas:
         index = self.cari_tugas_berdasarkan_nilai(item['values'])
 
         if index is not None:
-            progress = self.var_progress.get()
-            self.daftar_tugas[index]['progress'] = progress
-            self.simpan_tugas()
-            self.perbarui_daftar_tugas()
-            self.bersihkan_form()
+            progress = self.entri_progress.get()
+
+            try:
+                progress = int(progress)  # Ensure the progress is an integer
+            except ValueError:
+                messagebox.showerror("Error", "Progress harus berupa angka!")
+                return
+
+            if not (0 <= progress <= 100):
+                messagebox.showerror("Error", "Progress harus antara 0 dan 100!")
+                return
+
+            self.daftar_tugas[index]['progress'] = progress  # Update progress tugas
+            print(f"Progress yang baru: {self.daftar_tugas[index]['progress']}")  # Log progress baru
+            self.simpan_tugas()  # Simpan perubahan ke dalam file JSON
+            self.perbarui_daftar_tugas()  # Refresh daftar tugas yang ditampilkan
+            self.bersihkan_form()  # Kosongkan form input setelah pembaruan
         else:
             messagebox.showerror("Error", "Tugas tidak ditemukan!")
+
 
     def hapus_tugas(self):
         item_terpilih = self.pohon.selection()
@@ -272,15 +307,27 @@ class AplikasiPengingatTugas:
         return peta_prioritas.get(prioritas, 4)
 
     def simpan_tugas(self):
-        with open('tugas.json', 'w') as f:
-            json.dump(self.daftar_tugas, f)
+        with open("tasks.json", "w") as f:
+            if self.daftar_tugas:  # Hanya simpan jika ada data
+                json.dump(self.daftar_tugas, f, indent=4)
+            else:
+                f.write("")  # Kosongkan file jika tidak ada data
+
 
     def muat_tugas(self):
-        try:
-            with open('tugas.json', 'r') as f:
-                self.daftar_tugas = json.load(f)
-        except FileNotFoundError:
-            self.daftar_tugas = []
+        if os.path.exists("tasks.json"):  # Periksa apakah file tasks.json ada
+            with open("tasks.json", "r") as f:
+                data = f.read().strip()  # Baca isi file dan hapus spasi
+                if data:  # Jika file tidak kosong
+                    try:
+                        self.daftar_tugas = json.loads(data)
+                    except json.JSONDecodeError:
+                        self.daftar_tugas = []  # Jika data tidak valid, gunakan daftar kosong
+                else:
+                    self.daftar_tugas = []  # Jika file kosong, gunakan daftar kosong
+        else:
+            self.daftar_tugas = []  # Jika file tidak ada, gunakan daftar kosong
+
 
     def cek_pengingat(self):
         while True:
@@ -300,6 +347,7 @@ class AplikasiPengingatTugas:
                             f"Tenggat dalam {sisa_hari} hari!\n"
                             f"Progress: {tugas['progress']}%"
                         )
+                        
             time.sleep(3600)  # Cek setiap jam
     
 if __name__ == '__main__':
