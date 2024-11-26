@@ -27,6 +27,7 @@ class UserAuthApp:
         self.tab_control.add(self.register_tab, text='Register')
         self.tab_control.add(self.login_tab, text='Login')
         self.tab_control.pack(expand=1, fill='both')
+        self.tab_control.place(relx=0.5, rely=0.5, anchor="center")
 
         self.create_register_widgets()
         self.create_login_widgets()
@@ -109,7 +110,7 @@ class AplikasiPengingatTugas:
         self.font_entry = font.Font(family="Helvetica", size=10)
         
         # Mengatur warna latar belakang
-        self.akar.configure(bg="#f0f0f0")  # Warna latar belakang abu-abu muda
+        self.akar.configure(bg="#f0f0f0")  # Warna latar belakang biru
         
         self.daftar_tugas = []
         self.muat_tugas()
@@ -153,6 +154,9 @@ class AplikasiPengingatTugas:
         bingkai_tombol = ttk.Frame(bingkai_utama)
         bingkai_tombol.grid(row=6, column=0, columnspan=2, pady=10)
         
+        # Tombol Logout
+        ttk.Button(bingkai_utama, text="Logout", command=self.logout).grid(row=8, column=0, columnspan=2, pady=10)
+        
         style = ttk.Style()
         style.configure('TButton', font=self.font_label)
         
@@ -180,6 +184,12 @@ class AplikasiPengingatTugas:
         self.pohon.configure(yscrollcommand=scrollbar.set)
 
         self.perbarui_daftar_tugas()
+        
+    def logout(self):
+        self.akar.destroy()  # Menutup jendela pengingat tugas
+        root = tk.Tk()  # Membuka kembali jendela login
+        app = UserAuthApp(root)
+        root.mainloop()
 
     def tambah_tugas(self):
         matkul = self.entri_matkul.get()
