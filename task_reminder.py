@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, font, simpledialog, scrolledtext  
+from tkinter import ttk, messagebox, font, simpledialog, scrolledtext  # Tambahkan scrolledtext di sini
 import datetime
 import json
 from tkcalendar import Calendar
@@ -8,6 +8,7 @@ import time
 import os
 
 class UserAuthApp:
+    
     def __init__(self, root):
         self.root = root
         self.root.title("Task Manager")
@@ -15,7 +16,6 @@ class UserAuthApp:
         self.root.configure(bg="#ffffff")
 
         self.users_file = "users.json"
-        #self.load_users()
 
         self.create_main_widgets()
 
@@ -110,12 +110,29 @@ class UserAuthApp:
 
         # Login Button
         login_button = tk.Button(main_frame, text="Log In", 
-                                 command=self.login_user,
-                                 font=("Helvetica", 14), 
-                                 bg="#4CAF50", fg="white", 
-                                 relief=tk.FLAT, 
-                                 padx=20, pady=10)
-        login_button.pack(fill='x', pady=20)
+                         command=self.login_user,
+                         font=("Helvetica", 14), 
+                         bg="#4CAF50", fg="white", 
+                         relief=tk.FLAT, padx=20, pady=10)
+        login_button.pack(fill='x', pady=10)         
+
+    def go_to_dashboard_from_login(self):
+        username = self.login_username.get()
+        password = self.login_password.get()
+
+        try:
+            with open(self.users_file, "r") as f:
+                users = json.load(f)
+
+            if username in users and users[username] == password:
+                self.root.destroy()
+                dashboard_root = tk.Tk()
+                DashboardApp(dashboard_root, username)
+                dashboard_root.mainloop()
+            else:
+                messagebox.showerror("Error", "Invalid username or password!")
+        except FileNotFoundError:
+            messagebox.showerror("Error", "User  database not found. Please register first.")
 
     def show_register_page(self):
         # Clear existing widgets
@@ -182,6 +199,72 @@ class UserAuthApp:
                                     padx=20, pady=10)
         register_button.pack(fill='x', pady=20)
 
+        
+
+    def go_to_dashboard_from_register(self):
+        username = self.reg_username.get()
+        password = self.reg_password.get()
+
+        # Here, you should validate the registration
+        # For now, let's assume the registration is successful
+        if username and password:  # You would normally check for existing users
+            self.root.destroy()
+            dashboard_root = tk.Tk()
+            DashboardApp(dashboard_root, username)
+            dashboard_root.mainloop()
+        else:
+            messagebox.showerror("Error", "Please enter username and password!")
+
+    def register_user(self):
+        username = self.reg_username.get()
+        password = self.reg_password.get()
+
+        # Here you would typically check if the username already exists
+        # and validate the password. For demonstration, we will just
+        # assume registration is successful if both fields are filled.
+
+        if username and password:
+            # Save the user to the users.json file
+            try:
+                if os.path.exists(self.users_file):
+                    with open(self.users_file, "r") as f:
+                        users = json.load(f)
+                else:
+                    users = {}
+
+                if username in users:
+                    messagebox.showerror("Error", "Username already exists!")
+                else:
+                    users[username] = password  # Store the username and password
+                    with open(self.users_file, "w") as f:
+                        json.dump(users, f)
+
+                    messagebox.showinfo("Success", "Registration successful!")
+                    self.go_to_dashboard_from_register()  # Redirect to dashboard
+            except Exception as e:
+                messagebox.showerror("Error", f"An error occurred: {e}")
+        else:
+            messagebox.showerror("Error", "Please enter username and password!")
+
+    def login_user(self):
+        username = self.login_username.get()
+        password = self.login_password.get()
+
+        # Validate login
+        try:
+            with open(self.users_file, "r") as f:
+                users = json.load(f)
+
+            if username in users and users[username] == password:
+                messagebox.showinfo("Success", "Login successful!")
+                self.go_to_dashboard_from_login()  # Redirect to dashboard
+            else:
+                messagebox.showerror("Error", "Invalid username or password!")
+        except FileNotFoundError:
+            messagebox.showerror("Error", "User  database not found. Please register first.")
+        
+
+        
 class DashboardApp:
     def __init__(self, root, username):
         self.root = root
@@ -453,7 +536,7 @@ class DashboardApp:
 
 # The AplikasiPengingatTugas class remains the same as in the previous implementation
 class AplikasiPengingatTugas:
-    def _init_(self, akar):
+    def __init__(self, akar):
         self.akar = akar
         self.akar.title("Tambah Tugas")
         self.akar.geometry("800x600")
@@ -710,5 +793,5 @@ class AplikasiPengingatTugas:
     
 if __name__ == '__main__':
     root = tk.Tk()
-    app  = UserAuthApp(root)
+    app = UserAuthApp(root)
     root.mainloop()
