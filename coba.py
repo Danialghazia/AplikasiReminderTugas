@@ -11,7 +11,7 @@ class UserAuthApp:
     
     def __init__(self, root):
         self.root = root
-        self.root.title("   ")
+        self.root.title("Task Manager")
         self.root.geometry("400x600")
         self.root.configure(bg="#ffffff")
 
@@ -29,7 +29,7 @@ class UserAuthApp:
         main_frame.pack(expand=True, fill='both', padx=20, pady=20)
 
         # Logo or Title
-        title_label = tk.Label(main_frame, text="   ", 
+        title_label = tk.Label(main_frame, text="Task Manager", 
                                 font=("Helvetica", 24, "bold"), 
                                 fg="#333333", bg="#ffffff")
         title_label.pack(pady=(20, 30))
@@ -219,10 +219,12 @@ class UserAuthApp:
         username = self.reg_username.get()
         password = self.reg_password.get()
 
-        # Di sini Anda biasanya akan memeriksa apakah nama pengguna sudah ada dan mengisi kata sandi. Sebagai contoh, kita akan menganggap pendaftaran berhasil jika kedua kolom terisi.
+        # Here you would typically check if the username already exists
+        # and validate the password. For demonstration, we will just
+        # assume registration is successful if both fields are filled.
 
         if username and password:
-            # Simpan data pengguna ke file users.json
+            # Save the user to the users.json file
             try:
                 if os.path.exists(self.users_file):
                     with open(self.users_file, "r") as f:
@@ -231,18 +233,18 @@ class UserAuthApp:
                     users = {}
 
                 if username in users:
-                    messagebox.showerror("Error", "Username sudah terdaftar!")
+                    messagebox.showerror("Error", "Username already exists!")
                 else:
-                    users[username] = password  # Menyimpan Username dan Password
+                    users[username] = password  # Store the username and password
                     with open(self.users_file, "w") as f:
                         json.dump(users, f)
 
-                    messagebox.showinfo("Success", "Registrasi Berhasil!")
-                    self.go_to_dashboard_from_register()  # Mengarahkan kembali ke dashboard
+                    messagebox.showinfo("Success", "Registration successful!")
+                    self.go_to_dashboard_from_register()  # Redirect to dashboard
             except Exception as e:
-                messagebox.showerror("Error", f"Error! Terjadi Kesalahan: {e}")
+                messagebox.showerror("Error", f"An error occurred: {e}")
         else:
-            messagebox.showerror("Error", "Harap masukkan username dan password dengan benar!")
+            messagebox.showerror("Error", "Please enter username and password!")
 
     def login_user(self):
         username = self.login_username.get()
@@ -259,7 +261,7 @@ class UserAuthApp:
             else:
                 messagebox.showerror("Error", "Invalid username or password!")
         except FileNotFoundError:
-            messagebox.showerror("Error", "Database pengguna tidak ditemukan. Harap Sign In terlebih dahulu.!")
+            messagebox.showerror("Error", "User  database not found. Please register first.")
         
 
         
@@ -312,11 +314,6 @@ class DashboardApp:
         task_list_window = tk.Toplevel(self.root)
         task_list_window.title("Daftar Tugas")
         task_list_window.geometry("800x600")
-        
-        # Create Back Button
-        back_button = ttk.Button(task_list_window, text="Kembali ke Dashboard", 
-                                command=task_list_window.destroy)
-        back_button.pack(pady=10)
         
         # Create Treeview to show tasks
         columns = ('Mata Kuliah', 'Deskripsi', 'Tenggat', 'Prioritas', 'Progress')
@@ -384,11 +381,6 @@ class DashboardApp:
         task_history_window = tk.Toplevel(self.root)
         task_history_window.title("Riwayat Tugas")
         task_history_window.geometry("800x600")
-        
-        # Create Back Button
-        back_button = ttk.Button(task_history_window, text="Kembali ke Dashboard", 
-                                command=task_history_window.destroy)
-        back_button.pack(pady=10)
         
         # Create Treeview to show task history
         columns = ('Mata Kuliah', 'Deskripsi', 'Tenggat', 'Status')
@@ -582,22 +574,18 @@ class AplikasiPengingatTugas:
         judul = tk.Label(bingkai_utama, text="Tambah Tugas Kuliah", font=self.font_judul, bg="#f0f0f0")
         judul.grid(row=1, column=0, columnspan=2, pady=10)
 
-        # Input untuk Mata Kuliah
         ttk.Label(bingkai_utama, text="Mata Kuliah:", font=self.font_label).grid(row=2, column=0, pady=5, sticky='w')
         self.entri_matkul = ttk.Entry(bingkai_utama, width=30, font=self.font_entry)
         self.entri_matkul.grid(row=2, column=1, pady=5)
 
-        # Input untuk Deskripsi Tugas
         ttk.Label(bingkai_utama, text="Deskripsi Tugas:", font=self.font_label).grid(row=3, column=0, pady=5, sticky='w')
         self.entri_deskripsi = ttk.Entry(bingkai_utama, width=30, font=self.font_entry)
         self.entri_deskripsi.grid(row=3, column=1, pady=5)
 
-        # Input untuk Tenggat Waktu
         ttk.Label(bingkai_utama, text="Tenggat Waktu:", font=self.font_label).grid(row=4, column=0, pady=5, sticky='w')
         self.kalender = Calendar(bingkai_utama, selectmode='day', date_pattern='y-mm-dd')
         self.kalender.grid(row=4, column=1, pady=5)
 
-        # Input untuk Prioritas
         ttk.Label(bingkai_utama, text="Prioritas:", font=self.font_label).grid(row=5, column=0, pady=5, sticky='w')
         self.var_prioritas = tk.StringVar()
         self.combo_prioritas = ttk.Combobox(bingkai_utama, textvariable=self.var_prioritas, font=self.font_entry)
@@ -605,20 +593,41 @@ class AplikasiPengingatTugas:
         self.combo_prioritas.grid(row=5, column=1, pady=5)
         self.combo_prioritas.set('Sedang')
 
-        # Input untuk Progress
         ttk.Label(bingkai_utama, text="Progress (%):", font=self.font_label).grid(row=6, column=0, pady=5, sticky='w')
         self.var_progress = tk.StringVar(value="0")
         self.entri_progress = ttk.Entry(bingkai_utama, textvariable=self.var_progress, font=self.font_entry)
         self.entri_progress.grid(row=6, column=1, pady=5)
 
-        # Tombol untuk Menambah, Memperbarui, dan Menghapus Tugas
         bingkai_tombol = ttk.Frame(bingkai_utama)
-        bingkai_tombol.grid(row=7, column=0, columnspan=2, pady=10)  
-
+        bingkai_tombol.grid(row=7, column=0, columnspan=2, pady=10)
+        
         style = ttk.Style()
         style.configure('TButton', font=self.font_label)
-
+        
         ttk.Button(bingkai_tombol, text="Tambah Tugas", command=self.tambah_tugas).pack(side=tk.LEFT, padx=5)
+        ttk.Button(bingkai_tombol, text="Perbarui Progress", command=self.perbarui_progress).pack(side=tk.LEFT, padx=5)
+        ttk.Button(bingkai_tombol, text="Hapus Tugas", command=self.hapus_tugas).pack(side=tk.LEFT, padx=5)
+
+        # Mengatur style untuk Treeview
+        style.configure("Treeview", font=self.font_entry)
+        style.configure("Treeview.Heading", font=self.font_label)
+
+        self.pohon = ttk.Treeview(bingkai_utama, columns=('Mata Kuliah', 'Deskripsi', 'Tenggat', 'Prioritas', 'Progress'), 
+                                show='headings', height=10)
+        
+        self.pohon.heading('Mata Kuliah', text='Mata Kuliah')
+        self.pohon.heading('Deskripsi', text='Deskripsi')
+        self.pohon.heading('Tenggat', text='Tenggat')
+        self.pohon.heading('Prioritas', text='Prioritas')
+        self.pohon.heading('Progress', text='Progress')
+        
+        self.pohon.grid(row=8, column=0, columnspan=2, pady=10)
+        
+        scrollbar = ttk.Scrollbar(bingkai_utama, orient=tk.VERTICAL, command=self.pohon.yview)
+        scrollbar.grid(row=8, column=2, sticky='ns')
+        self.pohon.configure(yscrollcommand=scrollbar.set)
+
+        self.perbarui_daftar_tugas()
         
     def tambah_tugas(self):
         matkul = self.entri_matkul.get()
@@ -626,11 +635,6 @@ class AplikasiPengingatTugas:
         tenggat = self.kalender.get_date()
         prioritas = self.combo_prioritas.get()
         progress = self.entri_progress.get()
-        
-        # Validasi: Mata Kuliah tidak boleh hanya angka
-        if matkul.isdigit():
-            messagebox.showerror("Error", "Mata Kuliah tidak boleh hanya angka!")
-            return
         
         try:
             progress = int(progress)        
@@ -691,38 +695,9 @@ class AplikasiPengingatTugas:
                 return
 
             self.daftar_tugas[index]['progress'] = progress
-            
-            # Jika progress 100%, tambahkan ke riwayat tugas
-            if progress == 100:
-                self.add_to_task_history(self.daftar_tugas[index])
-                del self.daftar_tugas[index]  # Hapus tugas dari daftar
             self.simpan_tugas()
             self.perbarui_daftar_tugas()
             self.bersihkan_form()
-        else:
-            messagebox.showerror("Error", "Tugas tidak ditemukan!")
-
-    def add_to_task_history(self, task):
-        # Simpan tugas ke riwayat tugas
-        try:
-            if os.path.exists("task_history.json"):
-                with open("task_history.json", "r") as f:
-                    history = json.load(f)
-            else:
-                history = []
-
-            history.append({
-                'matkul': task['matkul'],
-                'deskripsi': task['deskripsi'],
-                'tenggat': task['tenggat'],
-                'status': "Tugas telah selesai"
-            })
-
-            with open("task_history.json", "w") as f:
-                json.dump(history, f, indent=4)
-        except Exception as e:
-            messagebox.showerror("Error", f"Error saat menyimpan riwayat tugas: {e}")
-            
         else:
             messagebox.showerror("Error", "Tugas tidak ditemukan!")
 
@@ -819,4 +794,4 @@ class AplikasiPengingatTugas:
 if __name__ == '__main__':
     root = tk.Tk()
     app = UserAuthApp(root)
-    root.mainloop()    
+    root.mainloop()
