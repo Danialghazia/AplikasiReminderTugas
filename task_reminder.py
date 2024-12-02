@@ -378,6 +378,55 @@ class DashboardApp:
         
         update_button = ttk.Button(task_list_window, text="Perbarui Progress", command=update_progress)
         update_button.pack(pady=10)
+        
+        def delete_task():
+            selected_item = tree.selection()
+            if not selected_item:
+                messagebox.showerror("Error", "Pilih tugas yang akan dihapus!")
+                return
+            
+            # Confirm deletion
+            confirm = messagebox.askyesno("Konfirmasi", "Apakah Anda yakin ingin menghapus tugas ini?")
+            if confirm:
+                item_values = tree.item(selected_item[0])['values']
+                # Remove task from memory
+                for task in tasks:
+                    if (task['matkul'] == item_values[0] and 
+                        task['deskripsi'] == item_values[1] and 
+                        task['tenggat'] == item_values[2]):
+                        tasks.remove(task)
+                        break
+                
+                # Save updated tasks back to file
+                with open("tasks.json", "w") as f:
+                    json.dump(tasks, f, indent=4)
+                
+                # Refresh treeview
+                tree.delete(selected_item[0])
+                
+        delete_button = ttk.Button(task_list_window, text="Hapus Tugas", command=delete_task)
+        delete_button.pack(pady=10)
+
+        # Optional: You can also add a refresh button to reload tasks from the file
+        def refresh_tasks():
+            # Clear existing items in the treeview
+            for item in tree.get_children():
+                tree.delete(item)
+
+            # Load tasks again
+            try:
+                with open("tasks.json", "r") as f:
+                    tasks = json.load(f)
+                    for task in tasks:
+                        tree.insert('', 'end', values=(
+                            task['matkul'], task['deskripsi'], task['tenggat'], 
+                            task['prioritas'], f"{task['progress']}%"
+                        ))
+            except FileNotFoundError:
+                messagebox.showinfo("Info", "Tidak ada tugas yang tersedia.")
+
+        refresh_button = ttk.Button(task_list_window, text="Refresh Tugas", command=refresh_tasks)
+        refresh_button.pack(pady=10)
 
     def open_task_history(self):
         # Create a new window to show task history
@@ -819,4 +868,4 @@ class AplikasiPengingatTugas:
 if __name__ == '__main__':
     root = tk.Tk()
     app = UserAuthApp(root)
-    root.mainloop()    
+    root.mainloop()
