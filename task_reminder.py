@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, font
+from tkinter import ttk, messagebox, font, simpledialog
 import datetime
 import json
 from tkcalendar import Calendar
@@ -10,7 +10,7 @@ import os
 class UserAuthApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("User  Authentication")
+        self.root.title("User Authentication")
         self.root.geometry("300x250")
 
         self.users_file = "users.json"
@@ -79,7 +79,7 @@ class UserAuthApp:
 
         self.users[username] = password
         self.save_users()
-        messagebox.showinfo("Success", "User  registered successfully!")
+        messagebox.showinfo("Success", "User registered successfully!")
         self.reg_username.delete(0, tk.END)
         self.reg_password.delete(0, tk.END)
 
@@ -91,26 +91,265 @@ class UserAuthApp:
             messagebox.showinfo("Success", "Login successful!")
             self.login_username.delete(0, tk.END)
             self.login_password.delete(0, tk.END)
-            akar = tk.Tk()
-            AplikasiPengingatTugas(akar)
-            akar.mainloop()
+            self.root.destroy()  # Close login window
             
+            # Open Dashboard
+            root_dashboard = tk.Tk()
+            DashboardApp(root_dashboard, username)
+            root_dashboard.mainloop()
         else:
             messagebox.showerror("Error", "Invalid username or password!")
 
+class DashboardApp:
+    def __init__(self, root, username):
+        self.root = root
+        self.username = username
+        self.root.title(f"Dashboard - {username}")
+        self.root.geometry("400x500")
+        
+        self.create_dashboard()
+
+    def create_dashboard(self):
+        # Styling
+        style = ttk.Style()
+        style.configure("TButton", font=("Helvetica", 12), padding=10)
+        
+        # Dashboard Title
+        title_label = tk.Label(self.root, text="Task Management Dashboard", 
+                                font=("Helvetica", 16, "bold"))
+        title_label.pack(pady=20)
+        
+        # Dashboard Buttons
+        buttons_frame = tk.Frame(self.root)
+        buttons_frame.pack(expand=True, fill='both', padx=50)
+        
+        dashboard_options = [
+            ("Tambah Tugas", self.open_add_task),
+            ("Daftar Tugas", self.open_task_list),
+            ("Riwayat Tugas", self.open_task_history),
+            ("Tambah Ringkasan", self.open_task_summary)
+        ]
+        
+        for text, command in dashboard_options:
+            button = ttk.Button(buttons_frame, text=text, command=command)
+            button.pack(fill='x', pady=10)
+        
+        # Logout Button
+        logout_button = ttk.Button(self.root, text="Logout", command=self.logout)
+        logout_button.pack(side='bottom', pady=20)
+
+    def open_add_task(self):
+        self.root.destroy()
+        root_task = tk.Tk()
+        task_app = AplikasiPengingatTugas(root_task)
+        root_task.mainloop()
+
+    def open_task_list(self):
+        # Create a new window to show task list
+        task_list_window = tk.Toplevel(self.root)
+        task_list_window.title("Daftar Tugas")
+        task_list_window.geometry("800x600")
+        
+        # Create Treeview to show tasks
+        columns = ('Mata Kuliah', 'Deskripsi', 'Tenggat', 'Prioritas', 'Progress')
+        tree = ttk.Treeview(task_list_window, columns=columns, show='headings')
+        
+        for col in columns:
+            tree.heading(col, text=col)
+            tree.column(col, width=100, anchor='center')
+        
+        # Load tasks
+        try:
+            with open("tasks.json", "r") as f:
+                tasks = json.load(f)
+                for task in tasks:
+                    tree.insert('', 'end', values=(
+                        task['matkul'], task['deskripsi'], task['tenggat'], 
+                        task['prioritas'], f"{task['progress']}%"
+                    ))
+        except FileNotFoundError:
+            messagebox.showinfo("Info", "Tidak ada tugas yang tersedia.")
+        
+        tree.pack(expand=True, fill='both', padx=10, pady=10)
+        
+        # Update Progress Button
+        def update_progress():
+            selected_item = tree.selection()
+            if not selected_item:
+                messagebox.showerror("Error", "Pilih tugas yang akan diperbarui!")
+                return
+            
+            # Open progress update dialog
+            new_progress = simpledialog.askinteger(
+                "Update Progress", 
+                "Masukkan progress baru (0-100):", 
+                minvalue=0, maxvalue=100
+            )
+            
+            if new_progress is not None:
+                # Update task progress in file
+                with open("tasks.json", "r") as f:
+                    tasks = json.load(f)
+                
+                item_values = tree.item(selected_item[0])['values']
+                for task in tasks:
+                    if (task['matkul'] == item_values[0] and 
+                        task['deskripsi'] == item_values[1] and 
+                        task['tenggat'] == item_values[2]):
+                        task['progress'] = new_progress
+                        break
+                
+                with open("tasks.json", "w") as f:
+                    json.dump(tasks, f, indent=4)
+                
+                # Refresh treeview
+                tree.item(selected_item[0], values=(
+                    item_values[0], item_values[1], item_values[2], 
+                    item_values[3], f"{new_progress}%"
+                ))
+        
+        update_button = ttk.Button(task_list_window, text="Perbarui Progress", command=update_progress)
+        update_button.pack(pady=10)
+
+    def open_task_history(self):
+        # Create a new window to show task history
+        task_history_window = tk.Toplevel(self.root)
+        task_history_window.title("Riwayat Tugas")
+        task_history_window.geometry("800x600")
+        
+        # Create Treeview to show task history
+        columns = ('Mata Kuliah', 'Deskripsi', 'Tenggat', 'Status')
+        tree = ttk.Treeview(task_history_window, columns=columns, show='headings')
+        
+        for col in columns:
+            tree.heading(col, text=col)
+            tree.column(col, width=150, anchor='center')
+        
+        # Load tasks and filter completed or overdue tasks
+        try:
+            with open("tasks.json", "r") as f:
+                tasks = json.load(f)
+                today = datetime.datetime.now().date()
+                
+                history_tasks = []
+                for task in tasks:
+                    task_date = datetime.datetime.strptime(task['tenggat'], '%Y-%m-%d').date()
+                    
+                    # If task is 100% complete or past deadline
+                    if task['progress'] == 100 or task_date < today:
+                        status = "Selesai" if task['progress'] == 100 else "Melewati Deadline"
+                        history_tasks.append((
+                            task['matkul'], task['deskripsi'], task['tenggat'], status
+                        ))
+                
+                for ht in history_tasks:
+                    tree.insert('', 'end', values=ht)
+        except FileNotFoundError:
+            messagebox.showinfo("Info", "Tidak ada riwayat tugas.")
+        
+        tree.pack(expand=True, fill='both', padx=10, pady=10)
+
+    def open_task_summary(self):
+        # Create a new window to add task summary
+        summary_window = tk.Toplevel(self.root)
+        summary_window.title("Tambah Ringkasan Tugas")
+        summary_window.geometry("800x600")
+        
+        # Create Treeview to show tasks for summary
+        columns = ('Mata Kuliah', 'Deskripsi', 'Tenggat', 'Prioritas', 'Ringkasan')
+        tree = ttk.Treeview(summary_window, columns=columns, show='headings')
+        
+        for col in columns:
+            tree.heading(col, text=col)
+            tree.column(col, width=100, anchor='center')
+        
+        # Load tasks
+        try:
+            with open("tasks.json", "r") as f:
+                tasks = json.load(f)
+                
+                # Try to load existing summaries
+                try:
+                    with open("task_summaries.json", "r") as sf:
+                        existing_summaries = json.load(sf)
+                except FileNotFoundError:
+                    existing_summaries = {}
+                
+                for task in tasks:
+                    # Check if summary already exists
+                    summary_key = f"{task['matkul']}_{task['deskripsi']}"
+                    existing_summary = existing_summaries.get(summary_key, "")
+                    
+                    tree.insert('', 'end', values=(
+                        task['matkul'], task['deskripsi'], task['tenggat'], 
+                        task['prioritas'], existing_summary
+                    ))
+        except FileNotFoundError:
+            messagebox.showinfo("Info", "Tidak ada tugas yang tersedia.")
+        
+        tree.pack(expand=True, fill='both', padx=10, pady=10)
+        
+        def add_summary():
+            selected_item = tree.selection()
+            if not selected_item:
+                messagebox.showerror("Error", "Pilih tugas untuk ditambahkan ringkasan!")
+                return
+            
+            # Open summary input dialog
+            summary = simpledialog.askstring(
+                "Tambah Ringkasan", 
+                "Masukkan ringkasan tugas:"
+            )
+            
+            if summary:
+                # Load or create summaries
+                try:
+                    with open("task_summaries.json", "r") as f:
+                        summaries = json.load(f)
+                except FileNotFoundError:
+                    summaries = {}
+                
+                # Get task details
+                item_values = tree.item(selected_item[0])['values']
+                summary_key = f"{item_values[0]}_{item_values[1]}"
+                
+                # Save summary
+                summaries[summary_key] = summary
+                
+                with open("task_summaries.json", "w") as f:
+                    json.dump(summaries, f, indent=4)
+                
+                # Update treeview
+                tree.item(selected_item[0], values=(
+                    item_values[0], item_values[1], item_values[2], 
+                    item_values[3], summary
+                ))
+                
+                messagebox.showinfo("Sukses", "Ringkasan berhasil ditambahkan!")
+        
+        add_summary_button = ttk.Button(summary_window, text="Tambah Ringkasan", command=add_summary)
+        add_summary_button.pack(pady=10)
+
+    def logout(self):
+        self.root.destroy()
+        root = tk.Tk()
+        app = UserAuthApp(root)
+        root.mainloop()
+
+# The AplikasiPengingatTugas class remains the same as in the previous implementation
 class AplikasiPengingatTugas:
     def __init__(self, akar):
         self.akar = akar
-        self.akar.title("Aplikasi Pengingat Tugas Kuliah")
+        self.akar.title("Tambah Tugas")
         self.akar.geometry("800x600")
         
-        # Mengatur font
+        # Font settings
         self.font_judul = font.Font(family="Helvetica", size=14, weight="bold")
         self.font_label = font.Font(family="Helvetica", size=10)
         self.font_entry = font.Font(family="Helvetica", size=10)
         
-        # Mengatur warna latar belakang
-        self.akar.configure(bg="#f0f0f0")  # Warna latar belakang biru
+        # Background color
+        self.akar.configure(bg="#f0f0f0")
         
         self.daftar_tugas = []
         self.muat_tugas()
@@ -119,43 +358,50 @@ class AplikasiPengingatTugas:
         self.thread_pengingat = threading.Thread(target=self.cek_pengingat, daemon=True)
         self.thread_pengingat.start()
 
+    def kembali_ke_dashboard(self):
+        self.akar.destroy()
+        root_dashboard = tk.Tk()
+        DashboardApp(root_dashboard, "Pengguna")  # You might want to pass the actual username
+        root_dashboard.mainloop()
+
     def siapkan_antarmuka(self):
         bingkai_utama = ttk.Frame(self.akar, padding="10")
         bingkai_utama.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         
+        # Tombol Kembali ke Dashboard
+        tombol_kembali = ttk.Button(bingkai_utama, text="Kembali ke Dashboard", command=self.kembali_ke_dashboard)
+        tombol_kembali.grid(row=0, column=0, pady=10, sticky='w')
+        
         # Judul aplikasi
-        judul = tk.Label(bingkai_utama, text="Pengingat Tugas Kuliah", font=self.font_judul, bg="#f0f0f0")
-        judul.grid(row=0, column=0, columnspan=2, pady=10)
+        judul = tk.Label(bingkai_utama, text="Tambah Tugas Kuliah", font=self.font_judul, bg="#f0f0f0")
+        judul.grid(row=1, column=0, columnspan=2, pady=10)
 
-        ttk.Label(bingkai_utama, text="Mata Kuliah:", font=self.font_label).grid(row=1, column=0, pady=5, sticky='w')
+        ttk.Label(bingkai_utama, text="Mata Kuliah:", font=self.font_label).grid(row=2, column=0, pady=5, sticky='w')
         self.entri_matkul = ttk.Entry(bingkai_utama, width=30, font=self.font_entry)
-        self.entri_matkul.grid(row=1, column=1, pady=5)
+        self.entri_matkul.grid(row=2, column=1, pady=5)
 
-        ttk.Label(bingkai_utama, text="Deskripsi Tugas:", font=self.font_label).grid(row=2, column=0, pady=5, sticky='w')
+        ttk.Label(bingkai_utama, text="Deskripsi Tugas:", font=self.font_label).grid(row=3, column=0, pady=5, sticky='w')
         self.entri_deskripsi = ttk.Entry(bingkai_utama, width=30, font=self.font_entry)
-        self.entri_deskripsi.grid(row=2, column=1, pady=5)
+        self.entri_deskripsi.grid(row=3, column=1, pady=5)
 
-        ttk.Label(bingkai_utama, text="Tenggat Waktu:", font=self.font_label).grid(row=3, column=0, pady=5, sticky='w')
+        ttk.Label(bingkai_utama, text="Tenggat Waktu:", font=self.font_label).grid(row=4, column=0, pady=5, sticky='w')
         self.kalender = Calendar(bingkai_utama, selectmode='day', date_pattern='y-mm-dd')
-        self.kalender.grid(row=3, column=1, pady=5)
+        self.kalender.grid(row=4, column=1, pady=5)
 
-        ttk.Label(bingkai_utama, text="Prioritas:", font=self.font_label).grid(row=4, column=0, pady=5, sticky='w')
+        ttk.Label(bingkai_utama, text="Prioritas:", font=self.font_label).grid(row=5, column=0, pady=5, sticky='w')
         self.var_prioritas = tk.StringVar()
         self.combo_prioritas = ttk.Combobox(bingkai_utama, textvariable=self.var_prioritas, font=self.font_entry)
         self.combo_prioritas['values'] = ('Tinggi', 'Sedang', 'Rendah')
-        self.combo_prioritas.grid(row=4, column=1, pady=5)
+        self.combo_prioritas.grid(row=5, column=1, pady=5)
         self.combo_prioritas.set('Sedang')
 
-        ttk.Label(bingkai_utama, text="Progress (%):", font=self.font_label).grid(row=5, column=0, pady=5, sticky='w')
+        ttk.Label(bingkai_utama, text="Progress (%):", font=self.font_label).grid(row=6, column=0, pady=5, sticky='w')
         self.var_progress = tk.StringVar(value="0")
         self.entri_progress = ttk.Entry(bingkai_utama, textvariable=self.var_progress, font=self.font_entry)
-        self.entri_progress.grid(row=5, column=1, pady=5)
+        self.entri_progress.grid(row=6, column=1, pady=5)
 
         bingkai_tombol = ttk.Frame(bingkai_utama)
-        bingkai_tombol.grid(row=6, column=0, columnspan=2, pady=10)
-        
-        # Tombol Logout
-        ttk.Button(bingkai_utama, text="Logout", command=self.logout).grid(row=8, column=0, columnspan=2, pady=10)
+        bingkai_tombol.grid(row=7, column=0, columnspan=2, pady=10)
         
         style = ttk.Style()
         style.configure('TButton', font=self.font_label)
@@ -177,26 +423,20 @@ class AplikasiPengingatTugas:
         self.pohon.heading('Prioritas', text='Prioritas')
         self.pohon.heading('Progress', text='Progress')
         
-        self.pohon.grid(row=7, column=0, columnspan=2, pady=10)
+        self.pohon.grid(row=8, column=0, columnspan=2, pady=10)
         
         scrollbar = ttk.Scrollbar(bingkai_utama, orient=tk.VERTICAL, command=self.pohon.yview)
-        scrollbar.grid(row=7, column=2, sticky='ns')
+        scrollbar.grid(row=8, column=2, sticky='ns')
         self.pohon.configure(yscrollcommand=scrollbar.set)
 
         self.perbarui_daftar_tugas()
         
-    def logout(self):
-        self.akar.destroy()  # Menutup jendela pengingat tugas
-        root = tk.Tk()  # Membuka kembali jendela login
-        app = UserAuthApp(root)
-        root.mainloop()
-
     def tambah_tugas(self):
         matkul = self.entri_matkul.get()
         deskripsi = self.entri_deskripsi.get()
         tenggat = self.kalender.get_date()
-        prioritas = self.combo_prioritas.get()  # Ambil nilai prioritas
-        progress = self.entri_progress.get()    # Ambil nilai progress
+        prioritas = self.combo_prioritas.get()
+        progress = self.entri_progress.get()
         
         try:
             progress = int(progress)        
@@ -216,13 +456,10 @@ class AplikasiPengingatTugas:
             messagebox.showerror("Error", "Progress harus antara 0 dan 100!")
             return
     
-        # Debugging nilai variabel
-        print(f"Matkul: {matkul}, Deskripsi: {deskripsi}, Tenggat: {tenggat}, Prioritas: {prioritas}, Progress: {progress}")
-
         # Validasi: Semua field harus diisi
-        # if not all([matkul, deskripsi, tenggat, prioritas]):
-        #     messagebox.showerror("Error", "Semua field harus diisi!")
-        #     return
+        if not all([matkul, deskripsi]):
+            messagebox.showerror("Error", "Mata Kuliah dan Deskripsi harus diisi!")
+            return
 
         tugas = {
             'matkul': str(matkul),
@@ -250,7 +487,7 @@ class AplikasiPengingatTugas:
             progress = self.entri_progress.get()
 
             try:
-                progress = int(progress)  # Ensure the progress is an integer
+                progress = int(progress)
             except ValueError:
                 messagebox.showerror("Error", "Progress harus berupa angka!")
                 return
@@ -259,14 +496,12 @@ class AplikasiPengingatTugas:
                 messagebox.showerror("Error", "Progress harus antara 0 dan 100!")
                 return
 
-            self.daftar_tugas[index]['progress'] = progress  # Update progress tugas
-            print(f"Progress yang baru: {self.daftar_tugas[index]['progress']}")  # Log progress baru
-            self.simpan_tugas()  # Simpan perubahan ke dalam file JSON
-            self.perbarui_daftar_tugas()  # Refresh daftar tugas yang ditampilkan
-            self.bersihkan_form()  # Kosongkan form input setelah pembaruan
+            self.daftar_tugas[index]['progress'] = progress
+            self.simpan_tugas()
+            self.perbarui_daftar_tugas()
+            self.bersihkan_form()
         else:
             messagebox.showerror("Error", "Tugas tidak ditemukan!")
-
 
     def hapus_tugas(self):
         item_terpilih = self.pohon.selection()
@@ -323,7 +558,6 @@ class AplikasiPengingatTugas:
             else:
                 f.write("")  # Kosongkan file jika tidak ada data
 
-
     def muat_tugas(self):
         if os.path.exists("tasks.json"):  # Periksa apakah file tasks.json ada
             with open("tasks.json", "r") as f:
@@ -338,7 +572,6 @@ class AplikasiPengingatTugas:
         else:
             self.daftar_tugas = []  # Jika file tidak ada, gunakan daftar kosong
 
-
     def cek_pengingat(self):
         while True:
             tanggal_sekarang = datetime.datetime.now().date()
@@ -346,7 +579,7 @@ class AplikasiPengingatTugas:
                 tenggat = datetime.datetime.strptime(tugas['tenggat'], '%Y-%m-%d').date()
                 sisa_hari = (tenggat - tanggal_sekarang).days
                 
-                if sisa_hari <= 3 and tugas['progress'] != '100':
+                if sisa_hari <= 3 and tugas['progress'] < 100:
                     prioritas = tugas['prioritas']
                     if (prioritas == 'Tinggi' and sisa_hari <= 3) or \
                        (prioritas == 'Sedang' and sisa_hari <= 2) or \
