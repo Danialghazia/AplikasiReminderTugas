@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, font, simpledialog
+from tkinter import ttk, messagebox, font, simpledialog, scrolledtext  
 import datetime
 import json
 from tkcalendar import Calendar
@@ -10,95 +10,177 @@ import os
 class UserAuthApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("User Authentication")
-        self.root.geometry("300x250")
+        self.root.title("Task Manager")
+        self.root.geometry("400x600")
+        self.root.configure(bg="#ffffff")
 
         self.users_file = "users.json"
-        self.load_users()
+        #self.load_users()
 
-        self.create_widgets()
+        self.create_main_widgets()
 
-    def create_widgets(self):
-        self.tab_control = ttk.Notebook(self.root)
+    def create_main_widgets(self):
+        # Clear any existing widgets
+        for widget in self.root.winfo_children():
+            widget.destroy()
 
-        self.register_tab = ttk.Frame(self.tab_control)
-        self.login_tab = ttk.Frame(self.tab_control)
+        # Main frame
+        main_frame = tk.Frame(self.root, bg="#ffffff")
+        main_frame.pack(expand=True, fill='both', padx=20, pady=20)
 
-        self.tab_control.add(self.register_tab, text='Register')
-        self.tab_control.add(self.login_tab, text='Login')
-        self.tab_control.pack(expand=1, fill='both')
-        self.tab_control.place(relx=0.5, rely=0.5, anchor="center")
+        # Logo or Title
+        title_label = tk.Label(main_frame, text="Task Manager", 
+                                font=("Helvetica", 24, "bold"), 
+                                fg="#333333", bg="#ffffff")
+        title_label.pack(pady=(20, 30))
 
-        self.create_register_widgets()
-        self.create_login_widgets()
+        # Log In Button
+        login_button = tk.Button(main_frame, text="Log In Now", 
+                                 command=self.show_login_page,
+                                 font=("Helvetica", 14), 
+                                 bg="#4CAF50", fg="white", 
+                                 relief=tk.FLAT, 
+                                 padx=20, pady=10)
+        login_button.pack(fill='x', pady=10)
 
-    def create_register_widgets(self):
-        ttk.Label(self.register_tab, text="Username:").grid(row=0, column=0, padx=10, pady=10)
-        self.reg_username = ttk.Entry(self.register_tab)
-        self.reg_username.grid(row=0, column=1, padx=10, pady=10)
+        # Sign Up Button
+        signup_button = tk.Button(main_frame, text="Sign Up Now", 
+                                  command=self.show_register_page,
+                                  font=("Helvetica", 14), 
+                                  bg="#2196F3", fg="white", 
+                                  relief=tk.FLAT, 
+                                  padx=20, pady=10)
+        signup_button.pack(fill='x', pady=10)
 
-        ttk.Label(self.register_tab, text="Password:").grid(row=1, column=0, padx=10, pady=10)
-        self.reg_password = ttk.Entry(self.register_tab, show='*')
-        self.reg_password.grid(row=1, column=1, padx=10, pady=10)
+    def show_login_page(self):
+        # Clear existing widgets
+        for widget in self.root.winfo_children():
+            widget.destroy()
 
-        ttk.Button(self.register_tab, text="Register", command=self.register_user).grid(row=2, columnspan=2, pady=10)
+        # Main frame
+        main_frame = tk.Frame(self.root, bg="#ffffff")
+        main_frame.pack(expand=True, fill='both', padx=20, pady=20)
 
-    def create_login_widgets(self):
-        ttk.Label(self.login_tab, text="Username:").grid(row=0, column=0, padx=10, pady=10)
-        self.login_username = ttk.Entry(self.login_tab)
-        self.login_username.grid(row=0, column=1, padx=10, pady=10)
+        # Back Button
+        back_button = tk.Button(main_frame, text="← Back", 
+                                command=self.create_main_widgets,
+                                font=("Helvetica", 12), 
+                                bg="#ffffff", fg="#333333", 
+                                relief=tk.FLAT)
+        back_button.pack(anchor='w', pady=(0, 20))
 
-        ttk.Label(self.login_tab, text="Password:").grid(row=1, column=0, padx=10, pady=10)
-        self.login_password = ttk.Entry(self.login_tab, show='*')
-        self.login_password.grid(row=1, column=1, padx=10, pady=10)
+        # Title
+        title_label = tk.Label(main_frame, text="Log In", 
+                               font=("Helvetica", 24, "bold"), 
+                               fg="#333333", bg="#ffffff")
+        title_label.pack(pady=(0, 30))
 
-        ttk.Button(self.login_tab, text="Login", command=self.login_user).grid(row=2, columnspan=2, pady=10)
+        # Username Entry
+        username_frame = tk.Frame(main_frame, bg="#ffffff")
+        username_frame.pack(fill='x', pady=10)
+        
+        username_label = tk.Label(username_frame, text="Username", 
+                                  font=("Helvetica", 12), 
+                                  bg="#ffffff", fg="#666666")
+        username_label.pack(anchor='w')
+        
+        self.login_username = tk.Entry(username_frame, 
+                                       font=("Helvetica", 14), 
+                                       bg="#f0f0f0", 
+                                       relief=tk.FLAT, 
+                                       width=30)
+        self.login_username.pack(fill='x', ipady=8)
+        
+        # Password Entry
+        password_frame = tk.Frame(main_frame, bg="#ffffff")
+        password_frame.pack(fill='x', pady=10)
+        
+        password_label = tk.Label(password_frame, text="Password", 
+                                  font=("Helvetica", 12), 
+                                  bg="#ffffff", fg="#666666")
+        password_label.pack(anchor='w')
+        
+        self.login_password = tk.Entry(password_frame, 
+                                       show='*', 
+                                       font=("Helvetica", 14), 
+                                       bg="#f0f0f0", 
+                                       relief=tk.FLAT, 
+                                       width=30)
+        self.login_password.pack(fill='x', ipady=8)
 
-    def load_users(self):
-        if os.path.exists(self.users_file):
-            with open(self.users_file, 'r') as f:
-                self.users = json.load(f)
-        else:
-            self.users = {}
+        # Login Button
+        login_button = tk.Button(main_frame, text="Log In", 
+                                 command=self.login_user,
+                                 font=("Helvetica", 14), 
+                                 bg="#4CAF50", fg="white", 
+                                 relief=tk.FLAT, 
+                                 padx=20, pady=10)
+        login_button.pack(fill='x', pady=20)
 
-    def save_users(self):
-        with open(self.users_file, 'w') as f:
-            json.dump(self.users, f)
+    def show_register_page(self):
+        # Clear existing widgets
+        for widget in self.root.winfo_children():
+            widget.destroy()
 
-    def register_user(self):
-        username = self.reg_username.get()
-        password = self.reg_password.get()
+        # Main frame
+        main_frame = tk.Frame(self.root, bg="#ffffff")
+        main_frame.pack(expand=True, fill='both', padx=20, pady=20)
 
-        if username in self.users:
-            messagebox.showerror("Error", "Username already exists!")
-            return
+        # Back Button
+        back_button = tk.Button(main_frame, text="← Back", 
+                                command=self.create_main_widgets,
+                                font=("Helvetica", 12), 
+                                bg="#ffffff", fg="#333333", 
+                                relief=tk.FLAT)
+        back_button.pack(anchor='w', pady=(0, 20))
 
-        if not username or not password:
-            messagebox.showerror("Error", "Please fill in both fields!")
-            return
+        # Title
+        title_label = tk.Label(main_frame, text="Sign Up", 
+                               font=("Helvetica", 24, "bold"), 
+                               fg="#333333", bg="#ffffff")
+        title_label.pack(pady=(0, 30))
 
-        self.users[username] = password
-        self.save_users()
-        messagebox.showinfo("Success", "User registered successfully!")
-        self.reg_username.delete(0, tk.END)
-        self.reg_password.delete(0, tk.END)
+        # Username Entry
+        username_frame = tk.Frame(main_frame, bg="#ffffff")
+        username_frame.pack(fill='x', pady=10)
+        
+        username_label = tk.Label(username_frame, text="Username", 
+                                  font=("Helvetica", 12), 
+                                  bg="#ffffff", fg="#666666")
+        username_label.pack(anchor='w')
+        
+        self.reg_username = tk.Entry(username_frame, 
+                                     font=("Helvetica", 14), 
+                                     bg="#f0f0f0", 
+                                     relief=tk.FLAT, 
+                                     width=30)
+        self.reg_username.pack(fill='x', ipady=8)
+        
+        # Password Entry
+        password_frame = tk.Frame(main_frame, bg="#ffffff")
+        password_frame.pack(fill='x', pady=10)
+        
+        password_label = tk.Label(password_frame, text="Password", 
+                                  font=("Helvetica", 12), 
+                                  bg="#ffffff", fg="#666666")
+        password_label.pack(anchor='w')
+        
+        self.reg_password = tk.Entry(password_frame, 
+                                     show='*', 
+                                     font=("Helvetica", 14), 
+                                     bg="#f0f0f0", 
+                                     relief=tk.FLAT, 
+                                     width=30)
+        self.reg_password.pack(fill='x', ipady=8)
 
-    def login_user(self):
-        username = self.login_username.get()
-        password = self.login_password.get()
-
-        if username in self.users and self.users[username] == password:
-            messagebox.showinfo("Success", "Login successful!")
-            self.login_username.delete(0, tk.END)
-            self.login_password.delete(0, tk.END)
-            self.root.destroy()  # Close login window
-            
-            # Open Dashboard
-            root_dashboard = tk.Tk()
-            DashboardApp(root_dashboard, username)
-            root_dashboard.mainloop()
-        else:
-            messagebox.showerror("Error", "Invalid username or password!")
+        # Register Button
+        register_button = tk.Button(main_frame, text="Sign Up", 
+                                    command=self.register_user,
+                                    font=("Helvetica", 14), 
+                                    bg="#2196F3", fg="white", 
+                                    relief=tk.FLAT, 
+                                    padx=20, pady=10)
+        register_button.pack(fill='x', pady=20)
 
 class DashboardApp:
     def __init__(self, root, username):
@@ -253,7 +335,12 @@ class DashboardApp:
         # Create a new window to add task summary
         summary_window = tk.Toplevel(self.root)
         summary_window.title("Tambah Ringkasan Tugas")
-        summary_window.geometry("800x600")
+        summary_window.geometry("800x800")
+        
+        # Create Back Button
+        back_button = ttk.Button(summary_window, text="Kembali ke Dashboard", 
+                                command=summary_window.destroy)
+        back_button.pack(pady=10)
         
         # Create Treeview to show tasks for summary
         columns = ('Mata Kuliah', 'Deskripsi', 'Tenggat', 'Prioritas', 'Ringkasan')
@@ -262,6 +349,16 @@ class DashboardApp:
         for col in columns:
             tree.heading(col, text=col)
             tree.column(col, width=100, anchor='center')
+        
+        # Large summary text area
+        summary_frame = tk.Frame(summary_window)
+        summary_frame.pack(fill='both', expand=True, padx=10, pady=10)
+        
+        summary_text = scrolledtext.ScrolledText(summary_frame, 
+                                                 wrap=tk.WORD, 
+                                                 height=15, 
+                                                 font=("Helvetica", 12))
+        summary_text.pack(fill='both', expand=True)
         
         # Load tasks
         try:
@@ -287,19 +384,37 @@ class DashboardApp:
         except FileNotFoundError:
             messagebox.showinfo("Info", "Tidak ada tugas yang tersedia.")
         
-        tree.pack(expand=True, fill='both', padx=10, pady=10)
+        tree.pack(fill='x', padx=10, pady=10)
         
-        def add_summary():
+        def on_task_select(event):
+            selected_item = tree.selection()
+            if selected_item:
+                # Get selected task details
+                item_values = tree.item(selected_item[0])['values']
+                summary_key = f"{item_values[0]}_{item_values[1]}"
+                
+                # Load existing summary if available
+                try:
+                    with open("task_summaries.json", "r") as f:
+                        summaries = json.load(f)
+                    existing_summary = summaries.get(summary_key, "")
+                    summary_text.delete(1.0, tk.END)
+                    summary_text.insert(tk.END, existing_summary)
+                except FileNotFoundError:
+                    summary_text.delete(1.0, tk.END)
+        
+        def save_summary():
             selected_item = tree.selection()
             if not selected_item:
                 messagebox.showerror("Error", "Pilih tugas untuk ditambahkan ringkasan!")
                 return
             
-            # Open summary input dialog
-            summary = simpledialog.askstring(
-                "Tambah Ringkasan", 
-                "Masukkan ringkasan tugas:"
-            )
+            # Get task details
+            item_values = tree.item(selected_item[0])['values']
+            summary_key = f"{item_values[0]}_{item_values[1]}"
+            
+            # Get summary text
+            summary = summary_text.get(1.0, tk.END).strip()
             
             if summary:
                 # Load or create summaries
@@ -308,10 +423,6 @@ class DashboardApp:
                         summaries = json.load(f)
                 except FileNotFoundError:
                     summaries = {}
-                
-                # Get task details
-                item_values = tree.item(selected_item[0])['values']
-                summary_key = f"{item_values[0]}_{item_values[1]}"
                 
                 # Save summary
                 summaries[summary_key] = summary
@@ -325,10 +436,14 @@ class DashboardApp:
                     item_values[3], summary
                 ))
                 
-                messagebox.showinfo("Sukses", "Ringkasan berhasil ditambahkan!")
+                messagebox.showinfo("Sukses", "Ringkasan berhasil disimpan!")
         
-        add_summary_button = ttk.Button(summary_window, text="Tambah Ringkasan", command=add_summary)
-        add_summary_button.pack(pady=10)
+        # Bind treeview selection
+        tree.bind('<<TreeviewSelect>>', on_task_select)
+        
+        # Save Summary Button
+        save_summary_button = ttk.Button(summary_window, text="Simpan Ringkasan", command=save_summary)
+        save_summary_button.pack(pady=10)
 
     def logout(self):
         self.root.destroy()
@@ -338,7 +453,7 @@ class DashboardApp:
 
 # The AplikasiPengingatTugas class remains the same as in the previous implementation
 class AplikasiPengingatTugas:
-    def __init__(self, akar):
+    def _init_(self, akar):
         self.akar = akar
         self.akar.title("Tambah Tugas")
         self.akar.geometry("800x600")
@@ -595,5 +710,5 @@ class AplikasiPengingatTugas:
     
 if __name__ == '__main__':
     root = tk.Tk()
-    app = UserAuthApp(root)
+    app  = UserAuthApp(root)
     root.mainloop()
