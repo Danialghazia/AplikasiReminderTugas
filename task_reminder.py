@@ -304,7 +304,7 @@ class DashboardApp:
     def open_add_task(self):
         self.root.destroy()
         root_task = tk.Tk()
-        task_app = AplikasiPengingatTugas(root_task)
+        task_app = AplikasiPengingatTugas(root_task, self.username)
         root_task.mainloop()
 
     def open_task_list(self):
@@ -330,6 +330,12 @@ class DashboardApp:
         try:
             with open("tasks.json", "r") as f:
                 tasks = json.load(f)
+                
+                # Filter tasks for current user
+                tasks = [
+                    task for task in tasks
+                    if task.get('username', '') == self.username
+                ]
                 for task in tasks:
                     tree.insert('', 'end', values=(
                         task['matkul'], task['deskripsi'], task['tenggat'], 
@@ -591,9 +597,10 @@ class DashboardApp:
         app = UserAuthApp(root)
         root.mainloop()
 
-# The AplikasiPengingatTugas class remains the same as in the previous implementation
+
 class AplikasiPengingatTugas:
-    def __init__(self, akar):
+    def __init__(self, akar, username):
+        self.username = username
         self.akar = akar
         self.akar.title("Tambah Tugas")
         self.akar.geometry("800x600")
@@ -616,7 +623,7 @@ class AplikasiPengingatTugas:
     def kembali_ke_dashboard(self):
         self.akar.destroy()
         root_dashboard = tk.Tk()
-        DashboardApp(root_dashboard, "Pengguna")  # You might want to pass the actual username
+        DashboardApp(root_dashboard, self.username)  
         root_dashboard.mainloop()
 
     def siapkan_antarmuka(self):
@@ -676,6 +683,12 @@ class AplikasiPengingatTugas:
         prioritas = self.combo_prioritas.get()
         progress = self.entri_progress.get()
         
+        print("Mata Kuliah:", matkul)
+        print("Deskripsi:", deskripsi)
+        print("Tenggat:", tenggat)
+        print("Prioritas:", prioritas)
+        print("Progress:", progress)
+        
         # Validasi: Mata Kuliah tidak boleh hanya angka
         if matkul.isdigit():
             messagebox.showerror("Error", "Mata Kuliah tidak boleh hanya angka!")
@@ -705,6 +718,7 @@ class AplikasiPengingatTugas:
             return
 
         tugas = {
+            'username': self.username,
             'matkul': str(matkul),
             'deskripsi': str(deskripsi),
             'tenggat': tenggat,
@@ -714,8 +728,13 @@ class AplikasiPengingatTugas:
 
         self.daftar_tugas.append(tugas)
         self.simpan_tugas()
+        
+        # Tambahkan messagebox konfirmasi
+        messagebox.showinfo("Sukses", "Tugas berhasil ditambahkan!")
         self.perbarui_daftar_tugas()
         self.bersihkan_form()
+        
+        
 
     def perbarui_progress(self):
         item_terpilih = self.pohon.selection()
@@ -824,11 +843,24 @@ class AplikasiPengingatTugas:
         return peta_prioritas.get(prioritas, 4)
 
     def simpan_tugas(self):
+        try:
+            with open("tasks.json", "r") as f:
+                existing_task = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            existing_tasks = []
+        
+        # Hapus tugas untuk pengguna sekarang
+        existing_tasks = [
+            task for task in existing_tasks 
+            if task.get('username', '') != self.username
+        ] if 'existing_tasks' in locals() else []
+        
+        # Menambahkan tuas pengguna sekarang
+        existing_tasks.extend(self.daftar_tugas)
+        
+        # Menyimpan semua tugas
         with open("tasks.json", "w") as f:
-            if self.daftar_tugas:  # Hanya simpan jika ada data
-                json.dump(self.daftar_tugas, f, indent=4)
-            else:
-                f.write("")  # Kosongkan file jika tidak ada data
+            json.dump(existing_tasks, f, indent=4)
 
     def muat_tugas(self):
         if os.path.exists("tasks.json"):  # Periksa apakah file tasks.json ada
@@ -836,7 +868,11 @@ class AplikasiPengingatTugas:
                 data = f.read().strip()  # Baca isi file dan hapus spasi
                 if data:  # Jika file tidak kosong
                     try:
-                        self.daftar_tugas = json.loads(data)
+                        all_task = json.loads(data)
+                        self.daftar_tugas = [
+                            tugas for tugas in all_task
+                            if tugas.get('username', '') ==self.username
+                        ]
                     except json.JSONDecodeError:
                         self.daftar_tugas = []  # Jika data tidak valid, gunakan daftar kosong
                 else:
