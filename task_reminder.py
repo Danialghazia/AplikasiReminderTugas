@@ -290,7 +290,7 @@ class DashboardApp:
             ("Tambah Tugas", self.open_add_task),
             ("Daftar Tugas", self.open_task_list),
             ("Riwayat Tugas", self.open_task_history),
-            ("Tambah Ringkasan", self.open_task_summary)
+            ("Tambah Rangkuman", self.open_task_summary)
         ]
         
         for text, command in dashboard_options:
@@ -311,12 +311,27 @@ class DashboardApp:
         # Create a new window to show task list
         task_list_window = tk.Toplevel(self.root)
         task_list_window.title("Daftar Tugas")
-        task_list_window.geometry("800x600")
+        task_list_window.geometry("800x650")
         
         # Create Back Button
         back_button = ttk.Button(task_list_window, text="Kembali ke Dashboard", 
                                 command=task_list_window.destroy)
         back_button.pack(pady=10)
+        
+        # Sorting Frame
+        sorting_frame = tk.Frame(task_list_window)
+        sorting_frame.pack(pady=10)
+        
+        # Sorting Label
+        sorting_label = tk.Label(sorting_frame, text="Sortir Berdasarkan:", font=("Helvetica", 10))
+        sorting_label.pack(side=tk.LEFT, padx=5)
+        
+        # Sorting Dropdown
+        sort_var = tk.StringVar(value="Prioritas")
+        sort_dropdown = ttk.Combobox(sorting_frame, textvariable=sort_var, 
+                                    values=["Prioritas", "Deadline", "Progress"], 
+                                    state="readonly", width=10)
+        sort_dropdown.pack(side=tk.LEFT, padx=5)
         
         # Create Treeview to show tasks
         columns = ('Mata Kuliah', 'Deskripsi', 'Tenggat', 'Prioritas', 'Progress')
@@ -336,11 +351,45 @@ class DashboardApp:
                     task for task in tasks
                     if task.get('username', '') == self.username
                 ]
-                for task in tasks:
-                    tree.insert('', 'end', values=(
-                        task['matkul'], task['deskripsi'], task['tenggat'], 
-                        task['prioritas'], f"{task['progress']}%"
-                    ))
+                
+                def sort_tasks(tasks, sort_by):
+                    def prioritas_key(task):
+                        prioritas_map = {'Tinggi': 1, 'Sedang': 2, 'Rendah': 3}
+                        return prioritas_map.get(task['prioritas'], 4)
+                    
+                    if sort_by == "Prioritas":
+                        return sorted(tasks, key=prioritas_key)
+                    elif sort_by == "Deadline":
+                        return sorted(tasks, key=lambda x: x['tenggat'])
+                    elif sort_by == "Progress":
+                        return sorted(tasks, key=lambda x: x['progress'], reverse=True)
+                    return tasks
+                
+                def update_treeview():
+                    # Clear existing items
+                    for item in tree.get_children():
+                        tree.delete(item)
+                    
+                    # Get current sorting method
+                    current_sort = sort_var.get()
+                    sorted_tasks = sort_tasks(tasks, current_sort)
+                    
+                    # Insert sorted tasks
+                    for task in sorted_tasks:
+                        tree.insert('', 'end', values=(
+                            task['matkul'], task['deskripsi'], task['tenggat'], 
+                            task['prioritas'], f"{task['progress']}%"
+                        ))
+                
+                # Initial population of treeview
+                update_treeview()
+                
+                # Bind sorting dropdown to update function
+                sort_dropdown.bind('<<ComboboxSelected>>', lambda e: update_treeview())
+                
+                tree.pack(expand=True, fill='both', padx=10, pady=10)
+            
+                
         except FileNotFoundError:
             messagebox.showinfo("Info", "Tidak ada tugas yang tersedia.")
         
