@@ -201,19 +201,7 @@ class UserAuthApp:
 
         
 
-    def go_to_dashboard_from_register(self):
-        username = self.reg_username.get()
-        password = self.reg_password.get()
-
-        # Here, you should validate the registration
-        # For now, let's assume the registration is successful
-        if username and password:  # You would normally check for existing users
-            self.root.destroy()
-            dashboard_root = tk.Tk()
-            DashboardApp(dashboard_root, username)
-            dashboard_root.mainloop()
-        else:
-            messagebox.showerror("Error", "Please enter username and password!")
+    
 
     def register_user(self):
         username = self.reg_username.get()
@@ -238,7 +226,7 @@ class UserAuthApp:
                         json.dump(users, f)
 
                     messagebox.showinfo("Success", "Registrasi Berhasil!")
-                    self.go_to_dashboard_from_register()  # Mengarahkan kembali ke dashboard
+                    
             except Exception as e:
                 messagebox.showerror("Error", f"Error! Terjadi Kesalahan: {e}")
         else:
