@@ -29,6 +29,12 @@ class UserAuthApp:
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight() 
         
+        # Hitung 90% dari lebar dan tinggi layar
+        window_width = int(screen_width * 1)
+        window_height = int(screen_height * 1)
+        
+        self.root.geometry(f"{window_width}x{window_height}")
+        
         # Load gambar
         self.bg_image= Image.open("12.png")  # Ganti dengan path gambar Anda
         self.bg_image = self.bg_image.resize((screen_width, screen_height), Image.Resampling.LANCZOS)
@@ -40,7 +46,7 @@ class UserAuthApp:
 
         # Tambahkan gambar latar belakang ke canvas
         self.canvas.create_image(0, 0, image=self.bg_image_tk, anchor="nw")
-
+     
         # Log In Button
         login_button = tk.Button(self.root, text="Log In Now", 
                                  command=self.show_login_page,
@@ -303,6 +309,12 @@ class DashboardApp:
         # Sesuaikan ukuran jendela
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight() 
+        
+        # Hitung 90% dari lebar dan tinggi layar
+        window_width = int(screen_width * 1)
+        window_height = int(screen_height * 1)
+    
+        self.root.geometry(f"{window_width}x{window_height}")
         
         # Load gambar
         self.bg_image= Image.open("13.png")  # Ganti dengan path gambar Anda
