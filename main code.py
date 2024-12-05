@@ -6,6 +6,8 @@ from tkcalendar import Calendar
 import threading
 import time
 import os
+from tkinter import Canvas
+from PIL import Image, ImageTk  
 
 class UserAuthApp:
     
@@ -13,8 +15,7 @@ class UserAuthApp:
         self.root = root
         self.root.title("   ")
         self.root.geometry("400x600")
-        self.root.configure(bg="#ffffff")
-
+    
         self.users_file = "users.json"
 
         self.create_main_widgets()
@@ -23,65 +24,93 @@ class UserAuthApp:
         # Clear any existing widgets
         for widget in self.root.winfo_children():
             widget.destroy()
+            
+        # Sesuaikan ukuran jendela
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight() 
+        
+        # Hitung 90% dari lebar dan tinggi layar
+        window_width = int(screen_width * 1)
+        window_height = int(screen_height * 1)
+        
+        self.root.geometry(f"{window_width}x{window_height}")
+        
+        # Load gambar
+        self.bg_image= Image.open("12.png")  # Ganti dengan path gambar Anda
+        self.bg_image = self.bg_image.resize((screen_width, screen_height), Image.Resampling.LANCZOS)
+        self.bg_image_tk = ImageTk.PhotoImage(self.bg_image)
+        
+        # Buat canvas untuk menampilkan gambar latar belakang
+        self.canvas = tk.Canvas(self.root, width=screen_width, height=screen_height)
+        self.canvas.pack(fill="both", expand=True)
 
-        # Main frame
-        main_frame = tk.Frame(self.root, bg="#ffffff")
-        main_frame.pack(expand=True, fill='both', padx=20, pady=20)
-
-        # Logo or Title
-        title_label = tk.Label(main_frame, text="   ", 
-                                font=("Helvetica", 24, "bold"), 
-                                fg="#333333", bg="#ffffff")
-        title_label.pack(pady=(20, 30))
-
+        # Tambahkan gambar latar belakang ke canvas
+        self.canvas.create_image(0, 0, image=self.bg_image_tk, anchor="nw")
+     
         # Log In Button
-        login_button = tk.Button(main_frame, text="Log In Now", 
+        login_button = tk.Button(self.root, text="Log In Now", 
                                  command=self.show_login_page,
                                  font=("Helvetica", 14), 
                                  bg="#4CAF50", fg="white", 
                                  relief=tk.FLAT, 
-                                 padx=20, pady=10)
-        login_button.pack(fill='x', pady=10)
+                                 padx=5, pady=5)
+        login_button.place(x=screen_width//2 - 150, y=screen_height//2)
 
         # Sign Up Button
-        signup_button = tk.Button(main_frame, text="Sign Up Now", 
+        signup_button = tk.Button(self.root, text="Sign Up Now", 
                                   command=self.show_register_page,
                                   font=("Helvetica", 14), 
                                   bg="#2196F3", fg="white", 
                                   relief=tk.FLAT, 
-                                  padx=20, pady=10)
-        signup_button.pack(fill='x', pady=10)
+                                  padx=5, pady=5)
+        signup_button.place(x=screen_width//2 + 50, y=screen_height//2)
 
     def show_login_page(self):
         # Clear existing widgets
         for widget in self.root.winfo_children():
             widget.destroy()
+        
+        # Sesuaikan ukuran jendela
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight() 
+        
+        # Load gambar
+        self.bg_image= Image.open("19.png")  # Ganti dengan path gambar Anda
+        self.bg_image = self.bg_image.resize((screen_width, screen_height), Image.Resampling.LANCZOS)
+        self.bg_image_tk = ImageTk.PhotoImage(self.bg_image)
+        
+        # Buat canvas untuk menampilkan gambar latar belakang
+        self.canvas = tk.Canvas(self.root, width=screen_width, height=screen_height)
+        self.canvas.pack(fill="both", expand=True)
 
+        # Tambahkan gambar latar belakang ke canvas
+        self.canvas.create_image(0, 0, image=self.bg_image_tk, anchor="nw")
+        
         # Main frame
-        main_frame = tk.Frame(self.root, bg="#ffffff")
-        main_frame.pack(expand=True, fill='both', padx=20, pady=20)
+        main_frame = tk.Frame(self.root, bg="#17224d", relief=tk.RAISED)  # Tambahkan border untuk memperjelas
+        main_frame.place(relx=0.5, rely=0.5, anchor='center', width=400, height=400)  # Atur posisi dan ukuran frame
 
         # Back Button
         back_button = tk.Button(main_frame, text="← Back", 
                                 command=self.create_main_widgets,
-                                font=("Helvetica", 12), 
-                                bg="#ffffff", fg="#333333", 
+                                font=("Helvetica", 12, "bold"), 
+                                bg="#17224d", fg="#ffffff", 
                                 relief=tk.FLAT)
         back_button.pack(anchor='w', pady=(0, 20))
 
         # Title
         title_label = tk.Label(main_frame, text="Log In", 
                                font=("Helvetica", 24, "bold"), 
-                               fg="#333333", bg="#ffffff")
+                               fg="#ffffff", bg="#17224d")
         title_label.pack(pady=(0, 30))
 
         # Username Entry
-        username_frame = tk.Frame(main_frame, bg="#ffffff")
+        username_frame = tk.Frame(main_frame, bg="#17224d")
         username_frame.pack(fill='x', pady=10)
         
         username_label = tk.Label(username_frame, text="Username", 
-                                  font=("Helvetica", 12), 
-                                  bg="#ffffff", fg="#666666")
+                                  font=("Helvetica", 12, "bold"), 
+                                  bg="#17224d", fg="#ffffff")
         username_label.pack(anchor='w')
         
         self.login_username = tk.Entry(username_frame, 
@@ -92,12 +121,12 @@ class UserAuthApp:
         self.login_username.pack(fill='x', ipady=8)
         
         # Password Entry
-        password_frame = tk.Frame(main_frame, bg="#ffffff")
+        password_frame = tk.Frame(main_frame, bg="#17224d")
         password_frame.pack(fill='x', pady=10)
         
         password_label = tk.Label(password_frame, text="Password", 
-                                  font=("Helvetica", 12), 
-                                  bg="#ffffff", fg="#666666")
+                                  font=("Helvetica", 12, "bold"), 
+                                  bg="#17224d", fg="#ffffff")
         password_label.pack(anchor='w')
         
         self.login_password = tk.Entry(password_frame, 
@@ -139,9 +168,25 @@ class UserAuthApp:
         for widget in self.root.winfo_children():
             widget.destroy()
 
+        # Sesuaikan ukuran jendela
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight() 
+        
+        # Load gambar
+        self.bg_image= Image.open("12.png")  # Ganti dengan path gambar Anda
+        self.bg_image = self.bg_image.resize((screen_width, screen_height), Image.Resampling.LANCZOS)
+        self.bg_image_tk = ImageTk.PhotoImage(self.bg_image)
+        
+        # Buat canvas untuk menampilkan gambar latar belakang
+        self.canvas = tk.Canvas(self.root, width=screen_width, height=screen_height)
+        self.canvas.pack(fill="both", expand=True)
+
+        # Tambahkan gambar latar belakang ke canvas
+        self.canvas.create_image(0, 0, image=self.bg_image_tk, anchor="nw")
+        
         # Main frame
-        main_frame = tk.Frame(self.root, bg="#ffffff")
-        main_frame.pack(expand=True, fill='both', padx=20, pady=20)
+        main_frame = tk.Frame(self.root, bg="#17224d", relief=tk.RAISED)  # Tambahkan border untuk memperjelas
+        main_frame.place(relx=0.5, rely=0.5, anchor='center', width=400, height=400)  # Atur posisi dan ukuran frame
 
         # Back Button
         back_button = tk.Button(main_frame, text="← Back", 
@@ -154,16 +199,16 @@ class UserAuthApp:
         # Title
         title_label = tk.Label(main_frame, text="Sign Up", 
                                font=("Helvetica", 24, "bold"), 
-                               fg="#333333", bg="#ffffff")
+                               fg="#ffffff", bg="#17224d")
         title_label.pack(pady=(0, 30))
 
         # Username Entry
-        username_frame = tk.Frame(main_frame, bg="#ffffff")
+        username_frame = tk.Frame(main_frame, bg="#17224d")
         username_frame.pack(fill='x', pady=10)
         
         username_label = tk.Label(username_frame, text="Username", 
                                   font=("Helvetica", 12), 
-                                  bg="#ffffff", fg="#666666")
+                                  bg="#17224d", fg="#ffffff")
         username_label.pack(anchor='w')
         
         self.reg_username = tk.Entry(username_frame, 
@@ -174,12 +219,12 @@ class UserAuthApp:
         self.reg_username.pack(fill='x', ipady=8)
         
         # Password Entry
-        password_frame = tk.Frame(main_frame, bg="#ffffff")
+        password_frame = tk.Frame(main_frame, bg="#17224d")
         password_frame.pack(fill='x', pady=10)
         
         password_label = tk.Label(password_frame, text="Password", 
                                   font=("Helvetica", 12), 
-                                  bg="#ffffff", fg="#666666")
+                                  bg="#17224d", fg="#ffffff")
         password_label.pack(anchor='w')
         
         self.reg_password = tk.Entry(password_frame, 
@@ -199,9 +244,6 @@ class UserAuthApp:
                                     padx=20, pady=10)
         register_button.pack(fill='x', pady=20)
 
-        
-
-    
 
     def register_user(self):
         username = self.reg_username.get()
@@ -249,7 +291,6 @@ class UserAuthApp:
         except FileNotFoundError:
             messagebox.showerror("Error", "Database pengguna tidak ditemukan. Harap Sign In terlebih dahulu.!")
         
-
         
 class DashboardApp:
     def __init__(self, root, username):
@@ -261,6 +302,32 @@ class DashboardApp:
         self.create_dashboard()
 
     def create_dashboard(self):
+        # Clear existing widgets
+        for widget in self.root.winfo_children():
+            widget.destroy()
+            
+        # Sesuaikan ukuran jendela
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight() 
+        
+        # Hitung 90% dari lebar dan tinggi layar
+        window_width = int(screen_width * 1)
+        window_height = int(screen_height * 1)
+    
+        self.root.geometry(f"{window_width}x{window_height}")
+        
+        # Load gambar
+        self.bg_image= Image.open("13.png")  # Ganti dengan path gambar Anda
+        self.bg_image = self.bg_image.resize((screen_width, screen_height), Image.Resampling.LANCZOS)
+        self.bg_image_tk = ImageTk.PhotoImage(self.bg_image)
+        
+        # Buat canvas untuk menampilkan gambar latar belakang
+        self.canvas = tk.Canvas(self.root, width=screen_width, height=screen_height)
+        self.canvas.pack(fill="both", expand=True)
+
+        # Tambahkan gambar latar belakang ke canvas
+        self.canvas.create_image(0, 0, image=self.bg_image_tk, anchor="nw")
+        
         # Styling
         style = ttk.Style()
         style.configure("TButton", font=("Helvetica", 12), padding=10)
@@ -271,9 +338,10 @@ class DashboardApp:
         title_label.pack(pady=20)
         
         # Dashboard Buttons
-        buttons_frame = tk.Frame(self.root)
-        buttons_frame.pack(expand=True, fill='both', padx=50)
+        buttons_frame = tk.Frame(self.canvas, bg="#17224d")  # Set background color for the frame
+        buttons_frame.place(relx=0.5, rely=0.5, anchor='center', width=300, height=300)  # Center the frame
         
+        #Create Button
         dashboard_options = [
             ("Tambah Tugas", self.open_add_task),
             ("Daftar Tugas", self.open_task_list),
@@ -287,19 +355,20 @@ class DashboardApp:
         
         # Logout Button
         logout_button = ttk.Button(self.root, text="Logout", command=self.logout)
-        logout_button.pack(side='bottom', pady=20)
+        logout_button.place(relx=0.5, rely=0.85, anchor='center', width=100, height=50)  # Center the frame
 
     def open_add_task(self):
         self.root.destroy()
         root_task = tk.Tk()
         task_app = AplikasiPengingatTugas(root_task, self.username)
         root_task.mainloop()
-
+    
     def open_task_list(self):
         # Create a new window to show task list
         task_list_window = tk.Toplevel(self.root)
         task_list_window.title("Daftar Tugas")
         task_list_window.geometry("800x650")
+        task_list_window.configure(bg="#17224d") 
         
         # Create Back Button
         back_button = ttk.Button(task_list_window, text="Kembali ke Dashboard", 
@@ -311,8 +380,8 @@ class DashboardApp:
         sorting_frame.pack(pady=10)
         
         # Sorting Label
-        sorting_label = tk.Label(sorting_frame, text="Sortir Berdasarkan:", font=("Helvetica", 10))
-        sorting_label.pack(side=tk.LEFT, padx=5)
+        sorting_label = tk.Label(sorting_frame, text="Sortir Berdasarkan:", font=("Helvetica", 10), bg='#17224d', fg='white')
+        sorting_label.pack(side=tk.LEFT)
         
         # Sorting Dropdown
         sort_var = tk.StringVar(value="Prioritas")
@@ -419,7 +488,14 @@ class DashboardApp:
                     item_values[3], f"{new_progress}%"
                 ))
         
-        update_button = ttk.Button(task_list_window, text="Perbarui Progress", command=update_progress)
+        update_button = tk.Button(
+            task_list_window,
+            text="Perbarui Progress",
+            command=update_progress,
+            bg="#28a745",  # Green background
+            fg="white",    # White text
+            font=("Helvetica", 10)
+        )
         update_button.pack(pady=10)
         
         def delete_task():
@@ -447,7 +523,7 @@ class DashboardApp:
                 # Refresh treeview
                 tree.delete(selected_item[0])
                 
-        delete_button = ttk.Button(task_list_window, text="Hapus Tugas", command=delete_task)
+        delete_button = tk.Button(task_list_window, text="Hapus Tugas", command=delete_task, bg='#d20505', fg='white')
         delete_button.pack(pady=10)
 
         # Optional: You can also add a refresh button to reload tasks from the file
@@ -468,7 +544,7 @@ class DashboardApp:
             except FileNotFoundError:
                 messagebox.showinfo("Info", "Tidak ada tugas yang tersedia.")
 
-        refresh_button = ttk.Button(task_list_window, text="Refresh Tugas", command=refresh_tasks)
+        refresh_button = tk.Button(task_list_window, text="Refresh Tugas", command=refresh_tasks, bg='#82bfff', fg='white')
         refresh_button.pack(pady=10)
 
     def open_task_history(self):
@@ -476,6 +552,7 @@ class DashboardApp:
         task_history_window = tk.Toplevel(self.root)
         task_history_window.title("Riwayat Tugas")
         task_history_window.geometry("800x600")
+        task_history_window.configure(bg='#17224d')
         
         # Create Back Button
         back_button = ttk.Button(task_history_window, text="Kembali ke Dashboard", 
@@ -519,6 +596,7 @@ class DashboardApp:
         summary_window = tk.Toplevel(self.root)
         summary_window.title("Tambah Ringkasan Tugas")
         summary_window.geometry("800x800")
+        summary_window.configure(bg='#17224d')
         
         # Create Back Button
         back_button = ttk.Button(summary_window, text="Kembali ke Dashboard", 
@@ -625,7 +703,7 @@ class DashboardApp:
         tree.bind('<<TreeviewSelect>>', on_task_select)
         
         # Save Summary Button
-        save_summary_button = ttk.Button(summary_window, text="Simpan Ringkasan", command=save_summary)
+        save_summary_button = tk.Button(summary_window, text="Simpan Ringkasan", command=save_summary, bg='#03d030', fg='white')
         save_summary_button.pack(pady=10)
 
     def logout(self):
@@ -642,13 +720,19 @@ class AplikasiPengingatTugas:
         self.akar.title("Tambah Tugas")
         self.akar.geometry("800x600")
         
+        style = ttk.Style()
+        style.configure('TLabel',
+                    background='#17224d', 
+                    foreground='white', 
+                    font=('Helvetica', 16, 'bold'))
+        
         # Font settings
         self.font_judul = font.Font(family="Helvetica", size=14, weight="bold")
         self.font_label = font.Font(family="Helvetica", size=10)
         self.font_entry = font.Font(family="Helvetica", size=10)
         
         # Background color
-        self.akar.configure(bg="#f0f0f0")
+        self.akar.configure(bg="#17224d")
         
         self.daftar_tugas = []
         self.muat_tugas()
@@ -656,23 +740,23 @@ class AplikasiPengingatTugas:
         
         self.thread_pengingat = threading.Thread(target=self.cek_pengingat, daemon=True)
         self.thread_pengingat.start()
-
-    def kembali_ke_dashboard(self):
-        self.akar.destroy()
-        root_dashboard = tk.Tk()
-        DashboardApp(root_dashboard, self.username)  
-        root_dashboard.mainloop()
-
+        
+      
     def siapkan_antarmuka(self):
-        bingkai_utama = ttk.Frame(self.akar, padding="10")
+        style = ttk.Style()
+        style.configure("Custom.TFrame", background="#17224d")
+        
+        bingkai_utama = ttk.Frame(self.akar, style="Custom.TFrame", padding="10")
+        bingkai_utama.pack(fill="both", expand=True)
         bingkai_utama.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        style.configure("Custom.TFrame", background="#17224d")
         
         # Tombol Kembali ke Dashboard
         tombol_kembali = ttk.Button(bingkai_utama, text="Kembali ke Dashboard", command=self.kembali_ke_dashboard)
         tombol_kembali.grid(row=0, column=0, pady=10, sticky='w')
         
         # Judul aplikasi
-        judul = tk.Label(bingkai_utama, text="Tambah Tugas Kuliah", font=self.font_judul, bg="#f0f0f0")
+        judul = tk.Label(bingkai_utama, text="Tambah Tugas Kuliah", font=self.font_judul, bg="#17224d", fg='white')
         judul.grid(row=1, column=0, columnspan=2, pady=10)
 
         # Input untuk Mata Kuliah
@@ -691,7 +775,7 @@ class AplikasiPengingatTugas:
         self.kalender.grid(row=4, column=1, pady=5)
 
         # Input untuk Prioritas
-        ttk.Label(bingkai_utama, text="Prioritas:", font=self.font_label).grid(row=5, column=0, pady=5, sticky='w')
+        ttk.Label(bingkai_utama, text="Prioritas:", font=self.font_label, style='TLabel').grid(row=5, column=0, pady=5, sticky='w')
         self.var_prioritas = tk.StringVar()
         self.combo_prioritas = ttk.Combobox(bingkai_utama, textvariable=self.var_prioritas, font=self.font_entry)
         self.combo_prioritas['values'] = ('Tinggi', 'Sedang', 'Rendah')
@@ -711,8 +795,8 @@ class AplikasiPengingatTugas:
         style = ttk.Style()
         style.configure('TButton', font=self.font_label)
 
-        ttk.Button(bingkai_tombol, text="Tambah Tugas", command=self.tambah_tugas).pack(side=tk.LEFT, padx=5)
-        
+        tk.Button(bingkai_tombol, text="Tambah Tugas", command=self.tambah_tugas, bg='#4CAF50', fg='white').pack(side=tk.LEFT)
+            
     def tambah_tugas(self):
         matkul = self.entri_matkul.get()
         deskripsi = self.entri_deskripsi.get()
@@ -771,7 +855,11 @@ class AplikasiPengingatTugas:
         self.perbarui_daftar_tugas()
         self.bersihkan_form()
         
-        
+    def kembali_ke_dashboard(self):
+        self.akar.destroy()
+        root_dashboard = tk.Tk()
+        DashboardApp(root_dashboard, self.username)  
+        root_dashboard.mainloop()    
 
     def perbarui_progress(self):
         item_terpilih = self.pohon.selection()
@@ -942,3 +1030,6 @@ if __name__ == '__main__':
     root = tk.Tk()
     app = UserAuthApp(root)
     root.mainloop()
+    
+    
+    
