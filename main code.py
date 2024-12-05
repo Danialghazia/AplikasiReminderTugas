@@ -173,7 +173,7 @@ class UserAuthApp:
         screen_height = self.root.winfo_screenheight() 
         
         # Load gambar
-        self.bg_image= Image.open("12.png")  # Ganti dengan path gambar Anda
+        self.bg_image= Image.open("19.png")  # Ganti dengan path gambar Anda
         self.bg_image = self.bg_image.resize((screen_width, screen_height), Image.Resampling.LANCZOS)
         self.bg_image_tk = ImageTk.PhotoImage(self.bg_image)
         
@@ -191,8 +191,8 @@ class UserAuthApp:
         # Back Button
         back_button = tk.Button(main_frame, text="← Back", 
                                 command=self.create_main_widgets,
-                                font=("Helvetica", 12), 
-                                bg="#ffffff", fg="#333333", 
+                                font=("Helvetica", 12, "bold"), 
+                                bg="#17224d", fg="#ffffff", 
                                 relief=tk.FLAT)
         back_button.pack(anchor='w', pady=(0, 20))
 
@@ -360,6 +360,9 @@ class DashboardApp:
     def open_add_task(self):
         self.root.destroy()
         root_task = tk.Tk()
+        root_task.attributes('-fullscreen', True)
+        root_task.overrideredirect(True)
+        
         task_app = AplikasiPengingatTugas(root_task, self.username)
         root_task.mainloop()
     
@@ -367,7 +370,11 @@ class DashboardApp:
         # Create a new window to show task list
         task_list_window = tk.Toplevel(self.root)
         task_list_window.title("Daftar Tugas")
-        task_list_window.geometry("800x650")
+        screen_width = task_list_window.winfo_screenwidth()
+        screen_height = task_list_window.winfo_screenheight()
+        window_width = int(screen_width * 1)
+        window_height = int(screen_height * 1)
+        task_list_window.geometry(f"{window_width}x{window_height}")
         task_list_window.configure(bg="#17224d") 
         
         # Create Back Button
@@ -550,8 +557,12 @@ class DashboardApp:
     def open_task_history(self):
         # Create a new window to show task history
         task_history_window = tk.Toplevel(self.root)
+        screen_width = task_history_window.winfo_screenwidth()
+        screen_height = task_history_window.winfo_screenheight()
+        window_width = int(screen_width * 1)
+        window_height = int(screen_height * 1)
+        task_history_window.geometry(f"{window_width}x{window_height}")
         task_history_window.title("Riwayat Tugas")
-        task_history_window.geometry("800x600")
         task_history_window.configure(bg='#17224d')
         
         # Create Back Button
@@ -594,8 +605,12 @@ class DashboardApp:
     def open_task_summary(self):
         # Create a new window to add task summary
         summary_window = tk.Toplevel(self.root)
+        screen_width = summary_window.winfo_screenwidth()
+        screen_height = summary_window.winfo_screenheight()
+        window_width = int(screen_width * 1)
+        window_height = int(screen_height * 1)
+        summary_window.geometry(f"{window_width}x{window_height}")
         summary_window.title("Tambah Ringkasan Tugas")
-        summary_window.geometry("800x800")
         summary_window.configure(bg='#17224d')
         
         # Create Back Button
@@ -746,15 +761,14 @@ class AplikasiPengingatTugas:
         style = ttk.Style()
         style.configure("Custom.TFrame", background="#17224d")
         
-        bingkai_utama = ttk.Frame(self.akar, style="Custom.TFrame", padding="10")
+        # Buat bingkai utama dengan latar belakang
+        bingkai_utama = ttk.Frame(self.akar, padding="10", style="Custom.TFrame")
         bingkai_utama.pack(fill="both", expand=True)
-        bingkai_utama.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-        style.configure("Custom.TFrame", background="#17224d")
-        
+
         # Tombol Kembali ke Dashboard
         tombol_kembali = ttk.Button(bingkai_utama, text="Kembali ke Dashboard", command=self.kembali_ke_dashboard)
         tombol_kembali.grid(row=0, column=0, pady=10, sticky='w')
-        
+
         # Judul aplikasi
         judul = tk.Label(bingkai_utama, text="Tambah Tugas Kuliah", font=self.font_judul, bg="#17224d", fg='white')
         judul.grid(row=1, column=0, columnspan=2, pady=10)
@@ -762,41 +776,44 @@ class AplikasiPengingatTugas:
         # Input untuk Mata Kuliah
         ttk.Label(bingkai_utama, text="Mata Kuliah:", font=self.font_label).grid(row=2, column=0, pady=5, sticky='w')
         self.entri_matkul = ttk.Entry(bingkai_utama, width=30, font=self.font_entry)
-        self.entri_matkul.grid(row=2, column=1, pady=5)
+        self.entri_matkul.grid(row=2, column=1, pady=5, sticky='ew')
 
         # Input untuk Deskripsi Tugas
         ttk.Label(bingkai_utama, text="Deskripsi Tugas:", font=self.font_label).grid(row=3, column=0, pady=5, sticky='w')
         self.entri_deskripsi = ttk.Entry(bingkai_utama, width=30, font=self.font_entry)
-        self.entri_deskripsi.grid(row=3, column=1, pady=5)
+        self.entri_deskripsi.grid(row=3, column=1, pady=5, sticky='ew')
 
         # Input untuk Tenggat Waktu
         ttk.Label(bingkai_utama, text="Tenggat Waktu:", font=self.font_label).grid(row=4, column=0, pady=5, sticky='w')
         self.kalender = Calendar(bingkai_utama, selectmode='day', date_pattern='y-mm-dd')
-        self.kalender.grid(row=4, column=1, pady=5)
+        self.kalender.grid(row=4, column=1, pady=5, sticky='ew')
 
         # Input untuk Prioritas
-        ttk.Label(bingkai_utama, text="Prioritas:", font=self.font_label, style='TLabel').grid(row=5, column=0, pady=5, sticky='w')
+        ttk.Label(bingkai_utama, text="Prioritas:", font=self.font_label).grid(row=5, column=0, pady=5, sticky='w')
         self.var_prioritas = tk.StringVar()
         self.combo_prioritas = ttk.Combobox(bingkai_utama, textvariable=self.var_prioritas, font=self.font_entry)
         self.combo_prioritas['values'] = ('Tinggi', 'Sedang', 'Rendah')
-        self.combo_prioritas.grid(row=5, column=1, pady=5)
+        self.combo_prioritas.grid(row=5, column=1, pady=5, sticky='ew')
         self.combo_prioritas.set('Sedang')
 
         # Input untuk Progress
         ttk.Label(bingkai_utama, text="Progress (%):", font=self.font_label).grid(row=6, column=0, pady=5, sticky='w')
         self.var_progress = tk.StringVar(value="0")
         self.entri_progress = ttk.Entry(bingkai_utama, textvariable=self.var_progress, font=self.font_entry)
-        self.entri_progress.grid(row=6, column=1, pady=5)
+        self.entri_progress.grid(row=6, column=1, pady=5, sticky='ew')
 
-        # Tombol untuk Menambah, Memperbarui, dan Menghapus Tugas
-        bingkai_tombol = ttk.Frame(bingkai_utama)
-        bingkai_tombol.grid(row=7, column=0, columnspan=2, pady=10)  
+        # Tombol untuk Menambah Tugas
+        add_task_button = ttk.Button(bingkai_utama, text="Tambah Tugas", command=self.tambah_tugas, style='TButton')
+        add_task_button.grid(row=7, column=0, columnspan=2, pady=10)
 
-        style = ttk.Style()
-        style.configure('TButton', font=self.font_label)
+        # Atur agar kolom kedua (kolom input) mengisi ruang yang tersedia
+        bingkai_utama.columnconfigure(1, weight=1)
 
-        tk.Button(bingkai_tombol, text="Tambah Tugas", command=self.tambah_tugas, bg='#4CAF50', fg='white').pack(side=tk.LEFT)
-            
+        # Atur agar baris dan kolom lainnya tidak mengubah ukuran
+        for i in range(8):
+            bingkai_utama.rowconfigure(i, weight=0)
+        bingkai_utama.rowconfigure(7, weight=1)  # Tombol tambah tugas di baris terakhir 
+    
     def tambah_tugas(self):
         matkul = self.entri_matkul.get()
         deskripsi = self.entri_deskripsi.get()
