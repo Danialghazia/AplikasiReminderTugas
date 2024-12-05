@@ -18,7 +18,7 @@ Aplikasi yang berfungsi sebagai reminder tugas atau pekerjaan yang sedang atau a
 4. Aplikasi akan mengurutkan Tugas berdasarkan skala prioritasnya.
 5. Aplikasi ini memungkinkan pengguna untuk mengupdate progress tugas dan memberikan deskripsi lanjutan (notes) pada tugas yang sudah dikerjakan.
 6. Aplikasi ini dapat menambahkan materi rangkuman untuk menunjang pengerjaan tugas yang di input
-7. Aplikasi dapat menampilkan riwayat tugas yang sudah ditambahkan
+7. Aplikasi dapat menampilkan riwayat tugas yang sudah diselesaikan pengguna
 
 # Site Map
 ![Untitled Diagram drawio (4)](https://github.com/user-attachments/assets/ce0b6971-3884-4969-827f-71cf5590dbd7)
