@@ -641,16 +641,22 @@ class DashboardApp:
             with open("tasks.json", "r") as f:
                 tasks = json.load(f)
                 
-                # Try to load existing summaries
+                 # Filter tugas untuk username saat ini
+                tasks = [task for task in tasks if task['username'] == self.username]
+                
+                    # Try to load existing summaries
                 try:
                     with open("task_summaries.json", "r") as sf:
                         existing_summaries = json.load(sf)
+                        # Filter rangkuman untuk username saat ini
+                        existing_summaries = {k: v for k, v in existing_summaries.items() 
+                                            if k.startswith(f"{self.username}_")}
                 except FileNotFoundError:
                     existing_summaries = {}
                 
                 for task in tasks:
-                    # Check if summary already exists
-                    summary_key = f"{task['matkul']}_{task['deskripsi']}"
+                    # Gunakan username sebagai prefix untuk kunci rangkuman
+                    summary_key = f"{self.username}_{task['matkul']}_{task['deskripsi']}"
                     existing_summary = existing_summaries.get(summary_key, "")
                     
                     tree.insert('', 'end', values=(
@@ -687,7 +693,7 @@ class DashboardApp:
             
             # Get task details
             item_values = tree.item(selected_item[0])['values']
-            summary_key = f"{item_values[0]}_{item_values[1]}"
+            summary_key = f"{self.username}_{item_values[0]}_{item_values[1]}"
             
             # Get summary text
             summary = summary_text.get(1.0, tk.END).strip()
