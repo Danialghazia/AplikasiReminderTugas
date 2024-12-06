@@ -563,8 +563,7 @@ class DashboardApp:
             except FileNotFoundError:
                 messagebox.showinfo("Info", "Tidak ada tugas yang tersedia.")
 
-        refresh_button = tk.Button(task_list_window, text="Refresh Tugas", command=refresh_tasks, bg='#82bfff', fg='white')
-        refresh_button.pack(pady=10)
+    
 
     def open_task_history(self):
         # Create a new window to show task history
@@ -1010,21 +1009,22 @@ class AplikasiPengingatTugas:
 
     def simpan_tugas(self):
         try:
+            # Baca seluruh tugas yang ada
             with open("tasks.json", "r") as f:
-                existing_task = json.load(f)
+                existing_tasks = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError):
             existing_tasks = []
         
-        # Hapus tugas untuk pengguna sekarang
+        # Hapus tugas untuk pengguna saat ini dari existing_tasks
         existing_tasks = [
             task for task in existing_tasks 
-            if task.get('username', '') != self.username
-        ] if 'existing_tasks' in locals() else []
+            if task.get('username') != self.username
+        ]
         
-        # Menambahkan tuas pengguna sekarang
+        # Tambahkan tugas baru untuk pengguna saat ini
         existing_tasks.extend(self.daftar_tugas)
         
-        # Menyimpan semua tugas
+        # Simpan kembali ke file
         with open("tasks.json", "w") as f:
             json.dump(existing_tasks, f, indent=4)
 
@@ -1034,13 +1034,18 @@ class AplikasiPengingatTugas:
                 data = f.read().strip()  # Baca isi file dan hapus spasi
                 if data:  # Jika file tidak kosong
                     try:
-                        all_task = json.loads(data)
+                        # Baca seluruh tugas dari file
+                        with open("tasks.json", "r") as f:
+                            all_tasks = json.load(f)
+                        
+                        # Filter tugas untuk username saat ini
                         self.daftar_tugas = [
-                            tugas for tugas in all_task
-                            if tugas.get('username', '') ==self.username
+                            tugas for tugas in all_tasks 
+                            if tugas.get('username') == self.username
                         ]
-                    except json.JSONDecodeError:
-                        self.daftar_tugas = []  # Jika data tidak valid, gunakan daftar kosong
+                    except (FileNotFoundError, json.JSONDecodeError):
+                        # Jika file tidak ditemukan atau error parsing, inisialisasi daftar tugas kosong
+                        self.daftar_tugas = []
                 else:
                     self.daftar_tugas = []  # Jika file kosong, gunakan daftar kosong
         else:
