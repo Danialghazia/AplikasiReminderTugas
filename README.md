@@ -21,8 +21,7 @@ Aplikasi yang berfungsi sebagai reminder tugas atau pekerjaan yang sedang atau a
 7. Aplikasi dapat menampilkan riwayat tugas yang sudah diselesaikan pengguna
 
 # Site Map
-![Untitled Diagram drawio (4)](https://github.com/user-attachments/assets/ce0b6971-3884-4969-827f-71cf5590dbd7)
-
+![Site Map](https://github.com/user-attachments/assets/6cbb5a2a-ceb1-4815-a782-3ba3bab21b41)
 
 # Diagram Alir
 ![Untitled Diagram drawio (5)](https://github.com/user-attachments/assets/7e605c9a-5ac7-4752-8c9f-d4073f5f9afa)
