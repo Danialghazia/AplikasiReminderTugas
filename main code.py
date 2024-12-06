@@ -610,7 +610,7 @@ class DashboardApp:
         window_width = int(screen_width * 1)
         window_height = int(screen_height * 1)
         summary_window.geometry(f"{window_width}x{window_height}")
-        summary_window.title("Tambah Ringkasan Tugas")
+        summary_window.title("Tambah Rangkuman Tugas")
         summary_window.configure(bg='#17224d')
         
         # Create Back Button
@@ -619,7 +619,7 @@ class DashboardApp:
         back_button.pack(pady=10)
         
         # Create Treeview to show tasks for summary
-        columns = ('Mata Kuliah', 'Deskripsi', 'Tenggat', 'Prioritas', 'Ringkasan')
+        columns = ('Mata Kuliah', 'Deskripsi', 'Tenggat', 'Prioritas', 'Rangkuman')
         tree = ttk.Treeview(summary_window, columns=columns, show='headings')
         
         for col in columns:
@@ -693,7 +693,7 @@ class DashboardApp:
             
             # Get task details
             item_values = tree.item(selected_item[0])['values']
-            summary_key = f"{self.username}_{item_values[0]}_{item_values[1]}"
+            summary_key = f"{item_values[0]}_{item_values[1]}"
             
             # Get summary text
             summary = summary_text.get(1.0, tk.END).strip()
@@ -718,13 +718,13 @@ class DashboardApp:
                     item_values[3], summary
                 ))
                 
-                messagebox.showinfo("Sukses", "Ringkasan berhasil disimpan!")
+                messagebox.showinfo("Sukses", "Rangkuman berhasil disimpan!")
         
         # Bind treeview selection
         tree.bind('<<TreeviewSelect>>', on_task_select)
         
         # Save Summary Button
-        save_summary_button = tk.Button(summary_window, text="Simpan Ringkasan", command=save_summary, bg='#03d030', fg='white')
+        save_summary_button = tk.Button(summary_window, text="Simpan Rangkuman", command=save_summary, bg='#03d030', fg='white')
         save_summary_button.pack(pady=10)
 
     def logout(self):
