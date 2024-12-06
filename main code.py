@@ -355,8 +355,20 @@ class DashboardApp:
         
         # Logout Button
         logout_button = ttk.Button(self.root, text="Logout", command=self.logout)
-        logout_button.place(relx=0.5, rely=0.85, anchor='center', width=100, height=50)  # Center the frame
+        logout_button.place(relx=0.35, rely=0.85, anchor='center', width=100, height=50)  # Center the frame
 
+        # Tambahkan tombol Selesai
+        selesai_button = ttk.Button(self.root, text="Selesai", command=self.selesai_program)
+        selesai_button.place(relx=0.65, rely=0.85, anchor='center', width=100, height=50)  # Geser ke kanan sedikit
+
+    def selesai_program(self):
+        # Konfirmasi sebelum menutup program
+        konfirmasi = messagebox.askyesno("Konfirmasi", "Apakah Anda yakin ingin mengakhiri program?")
+        if konfirmasi:
+            self.root.quit()  # Menutup window saat ini
+            self.root.destroy()  # Memastikan window ditutup
+            exit()  # Keluar dari program secara keseluruhan
+            
     def open_add_task(self):
         self.root.destroy()
         root_task = tk.Tk()
@@ -826,6 +838,12 @@ class AplikasiPengingatTugas:
         tenggat = self.kalender.get_date()
         prioritas = self.combo_prioritas.get()
         progress = self.entri_progress.get()
+        
+        # Validasi prioritas
+        prioritas_valid = ['Tinggi', 'Sedang', 'Rendah']
+        if prioritas not in prioritas_valid:
+            messagebox.showerror("Error", "Prioritas hanya boleh Tinggi, Sedang, atau Rendah!")
+            return
         
         print("Mata Kuliah:", matkul)
         print("Deskripsi:", deskripsi)
