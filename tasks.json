@@ -1,10 +1,18 @@
 [
     {
-        "username": "a",
-        "matkul": "dyga",
-        "deskripsi": "dajkv",
-        "tenggat": "2024-12-06",
-        "prioritas": "Sedang",
-        "progress": 89
+        "username": "Danial",
+        "matkul": "Biologi",
+        "deskripsi": "Sistem Organ",
+        "tenggat": "2024-12-09",
+        "prioritas": "Tinggi",
+        "progress": 35
+    },
+    {
+        "username": "Danial",
+        "matkul": "Fisika",
+        "deskripsi": "Torsi",
+        "tenggat": "2024-12-07",
+        "prioritas": "Rendah",
+        "progress": 45
     }
 ]
