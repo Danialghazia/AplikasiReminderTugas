@@ -1,16 +1,11 @@
-import tkinter as tk
-from tkinter import ttk, messagebox, font, simpledialog, scrolledtext  # Tambahkan scrolledtext di sini
-import datetime
 import json
-from tkcalendar import Calendar
-import threading
-import time
-import os
+import datetime
+import tkinter as tk
 import user_auth as user
-from tkinter import Canvas
+import task_manager as tm
 from PIL import Image, ImageTk  
 from tkinter import ttk, messagebox
-import task_manager as tm
+from tkinter import ttk, messagebox, simpledialog, scrolledtext 
 
 class DashboardApp:
     def __init__(self, root, username):
@@ -23,6 +18,7 @@ class DashboardApp:
 
     def create_dashboard(self):
         # Clear existing widgets
+        
         for widget in self.root.winfo_children():
             widget.destroy()
             
@@ -75,27 +71,31 @@ class DashboardApp:
         
         # Logout Button
         logout_button = ttk.Button(self.root, text="Logout", command=self.logout)
-        logout_button.place(relx=0.35, rely=0.85, anchor='center', width=100, height=50)  # Center the frame
+        logout_button.place(relx=0.5, rely=0.85, anchor='center', width=100, height=50)  # Center the frame
 
-        # Tambahkan tombol Selesai
-        selesai_button = ttk.Button(self.root, text="Selesai", command=self.selesai_program)
-        selesai_button.place(relx=0.65, rely=0.85, anchor='center', width=100, height=50)  # Geser ke kanan sedikit
-
-    def selesai_program(self):
-        # Konfirmasi sebelum menutup program
-        konfirmasi = messagebox.askyesno("Konfirmasi", "Apakah Anda yakin ingin mengakhiri program?")
-        if konfirmasi:
-            self.root.quit()  # Menutup window saat ini
-            self.root.destroy()  # Memastikan window ditutup
-            exit()  # Keluar dari program secara keseluruhan
+        try:
+            with open("tasks.json", "r") as f:
+                tasks = json.load(f)
+                
+                # Filter tasks for current user
+                tasks = [
+                    task for task in tasks
+                    if task.get('username', '') == self.username
+                ]
+                
+                for i in range(0, len(tasks)):
+                    messagebox.showinfo("Reminder", f"Mata kuliah: {tasks[i]["matkul"]}\nDeskripsi: {tasks[i]["deskripsi"]}\nPrioritas: {tasks[i]["prioritas"]}\nTenggat: {tasks[i]["tenggat"]}\nProgress: {tasks[i]["progress"]} %")
+                    
+        except FileNotFoundError:
+            messagebox.showinfo("Info", "Belum ada tugas!")
             
     def open_add_task(self):
-        self.root.destroy()
+        self.root.deiconify()
         root_task = tk.Tk()
         root_task.attributes('-fullscreen', True)
         root_task.overrideredirect(True)
         
-        task_app = tm.AplikasiPengingatTugas(root_task, self.username)
+        tm.AplikasiPengingatTugas(root_task, self.username)
         root_task.mainloop()
     
     def open_task_list(self):
@@ -211,21 +211,50 @@ class DashboardApp:
                     tasks = json.load(f)
                 
                 item_values = tree.item(selected_item[0])['values']
+                task_to_update = None
+                
                 for task in tasks:
                     if (task['matkul'] == item_values[0] and 
                         task['deskripsi'] == item_values[1] and 
                         task['tenggat'] == item_values[2]):
                         task['progress'] = new_progress
+                        task_to_update = task  # Simpan referensi tugas yang diupdate
                         break
                 
+                if new_progress == 100 and task_to_update:
+                    # Pindahkan tugas ke riwayat
+                    try:
+                        with open("riwayat_tugas.json", "r") as f:
+                            riwayat_tasks = json.load(f)
+                    except FileNotFoundError:
+                        riwayat_tasks = []  # Jika file tidak ada, buat list baru
+                    
+                    # Tambahkan tugas ke riwayat
+                    riwayat_tasks.append(task_to_update)
+                    
+                    # Simpan riwayat tugas
+                    with open("riwayat_tugas.json", "w") as f:
+                        json.dump(riwayat_tasks, f, indent=4)
+                    print("Data berhasil disimpan ke riwayat_tugas.json")
+                    
+                    # Hapus tugas dari daftar tugas
+                    tasks.remove(task_to_update)
+                    messagebox.showinfo("Sukses", "Tugas telah selesai dan dipindahkan ke riwayat tugas!")
+                else:
+                    messagebox.showinfo("Sukses", "Progress berhasil diperbarui!")
+                
+                # Simpan kembali tugas yang telah diperbarui
                 with open("tasks.json", "w") as f:
                     json.dump(tasks, f, indent=4)
                 
                 # Refresh treeview
-                tree.item(selected_item[0], values=(
-                    item_values[0], item_values[1], item_values[2], 
-                    item_values[3], f"{new_progress}%"
-                ))
+                if new_progress == 100:
+                    tree.delete(selected_item[0])  # Hapus item dari treeview
+                else:
+                    tree.item(selected_item[0], values=(
+                        item_values[0], item_values[1], item_values[2], 
+                        item_values[3], f"{new_progress}%"
+                    ))
         
         update_button = tk.Button(
             task_list_window,
@@ -310,7 +339,7 @@ class DashboardApp:
         
         # Load tasks and filter completed or overdue tasks
         try:
-            with open("tasks.json", "r") as f:
+            with open("riwayat_tugas.json", "r") as f:
                 tasks = json.load(f)
                 today = datetime.datetime.now().date()
                 

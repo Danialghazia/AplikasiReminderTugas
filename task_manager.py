@@ -157,7 +157,6 @@ class AplikasiPengingatTugas:
         
         # Tambahkan messagebox konfirmasi
         messagebox.showinfo("Sukses", "Tugas berhasil ditambahkan!")
-        self.perbarui_daftar_tugas()
         self.bersihkan_form()
         
     def kembali_ke_dashboard(self):
@@ -166,80 +165,6 @@ class AplikasiPengingatTugas:
         dash.DashboardApp(root_dashboard, self.username)  
         root_dashboard.mainloop()    
 
-    def perbarui_progress(self):
-        item_terpilih = self.pohon.selection()
-        if not item_terpilih:
-            messagebox.showerror("Error", "Pilih tugas yang akan diperbarui!")
-            return
-
-        item = self.pohon.item(item_terpilih)
-        index = self.cari_tugas_berdasarkan_nilai(item['values'])
-
-        if index is not None:
-            progress = self.entri_progress.get()
-
-            try:
-                progress = int(progress)
-            except ValueError:
-                messagebox.showerror("Error", "Progress harus berupa angka!")
-                return
-
-            if not (0 <= progress <= 100):
-                messagebox.showerror("Error", "Progress harus antara 0 dan 100!")
-                return
-
-            self.daftar_tugas[index]['progress'] = progress
-            
-            # Jika progress 100%, tambahkan ke riwayat tugas
-            if progress == 100:
-                self.add_to_task_history(self.daftar_tugas[index])
-                del self.daftar_tugas[index]  # Hapus tugas dari daftar
-            self.simpan_tugas()
-            self.perbarui_daftar_tugas()
-            self.bersihkan_form()
-        else:
-            messagebox.showerror("Error", "Tugas tidak ditemukan!")
-
-    def add_to_task_history(self, task):
-        # Simpan tugas ke riwayat tugas
-        try:
-            if os.path.exists("task_history.json"):
-                with open("task_history.json", "r") as f:
-                    history = json.load(f)
-            else:
-                history = []
-
-            history.append({
-                'matkul': task['matkul'],
-                'deskripsi': task['deskripsi'],
-                'tenggat': task['tenggat'],
-                'status': "Tugas telah selesai"
-            })
-
-            with open("task_history.json", "w") as f:
-                json.dump(history, f, indent=4)
-        except Exception as e:
-            messagebox.showerror("Error", f"Error saat menyimpan riwayat tugas: {e}")
-            
-        else:
-            messagebox.showerror("Error", "Tugas tidak ditemukan!")
-
-    def hapus_tugas(self):
-        item_terpilih = self.pohon.selection()
-        if not item_terpilih:
-            messagebox.showerror("Error", "Pilih tugas yang akan dihapus!")
-            return
-
-        item = self.pohon.item(item_terpilih)
-        index = self.cari_tugas_berdasarkan_nilai(item['values'])
-
-        if index is not None:
-            del self.daftar_tugas[index]
-            self.simpan_tugas()
-            self.perbarui_daftar_tugas()
-            self.bersihkan_form()
-        else:
-            messagebox.showerror("Error", "Tugas tidak ditemukan!")
 
     def cari_tugas_berdasarkan_nilai(self, nilai):
         for i, tugas in enumerate(self.daftar_tugas):
@@ -254,19 +179,6 @@ class AplikasiPengingatTugas:
         self.entri_deskripsi.delete(0, tk.END)
         self.var_progress.set("0")
         self.var_prioritas.set('Sedang')
-
-    def perbarui_daftar_tugas(self):
-        for item in self.pohon.get_children():
-            self.pohon.delete(item)
-        
-        for tugas in sorted(self.daftar_tugas, key=lambda x: (self.nilai_prioritas(x['prioritas']), x['tenggat'])):
-            self.pohon.insert('', tk.END, values=(
-                tugas['matkul'],
-                tugas['deskripsi'],
-                tugas['tenggat'],
-                tugas['prioritas'],
-                f"{tugas['progress']}%"
-            ))
 
     def nilai_prioritas(self, prioritas):
         peta_prioritas = {'Tinggi': 1, 'Sedang': 2, 'Rendah': 3}

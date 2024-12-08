@@ -1,34 +1,18 @@
 [
     {
-        "username": "Danial",
-        "matkul": "Biologi",
-        "deskripsi": "Sistem Organ",
-        "tenggat": "2024-12-09",
-        "prioritas": "Tinggi",
-        "progress": 60
-    },
-    {
-        "username": "Danial",
-        "matkul": "Fisika",
-        "deskripsi": "Torsi",
-        "tenggat": "2024-12-07",
-        "prioritas": "Rendah",
-        "progress": 45
-    },
-    {
-        "username": "b",
-        "matkul": "b",
-        "deskripsi": "b",
-        "tenggat": "2024-12-31",
-        "prioritas": "Tinggi",
-        "progress": 56
-    },
-    {
-        "username": "Luthfia",
-        "matkul": "Kalkulus",
-        "deskripsi": "Integral",
-        "tenggat": "2024-12-09",
+        "username": "Fadzli",
+        "matkul": "ips",
+        "deskripsi": "sejarah",
+        "tenggat": "2024-12-18",
         "prioritas": "Sedang",
-        "progress": 100
+        "progress": 69
+    },
+    {
+        "username": "Fadzli",
+        "matkul": "ipa",
+        "deskripsi": "bio",
+        "tenggat": "2024-12-26",
+        "prioritas": "Tinggi",
+        "progress": 45
     }
 ]
