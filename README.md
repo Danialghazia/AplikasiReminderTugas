@@ -25,9 +25,10 @@ Aplikasi yang berfungsi sebagai reminder tugas atau pekerjaan yang sedang atau a
 2. Datetime.
 3. Tkcalendar.
 4. Threading.
-5. Time.
-6. Pillow.
-7. OS.
+5. .JSON
+6. Time.
+7. Pillow.
+8. OS.
 
 # Site Map
 ![Site Map](https://github.com/user-attachments/assets/6cbb5a2a-ceb1-4815-a782-3ba3bab21b41)
