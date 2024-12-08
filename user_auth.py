@@ -1,51 +1,69 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, font, simpledialog
+from tkinter import ttk, messagebox, font, simpledialog, scrolledtext  # Tambahkan scrolledtext di sini
+import datetime
 import json
+from tkcalendar import Calendar
+import threading
+import time
 import os
-from PIL import Image, ImageTk
-import cbcb1  # Import the dashboard module
+from tkinter import Canvas
+from PIL import Image, ImageTk  
+from dashboard import DashboardApp
 
-class AuthApp:
+class UserAuthApp:
+    
     def __init__(self, root):
         self.root = root
-        self.root.title("Authentication")
-        self.root.geometry("1000x800")
-        
+        self.root.title("   ")
+        self.root.geometry("400x600")
+    
         self.users_file = "users.json"
+
         self.create_main_widgets()
 
     def create_main_widgets(self):
-        # Clear existing widgets
+        # Clear any existing widgets
         for widget in self.root.winfo_children():
             widget.destroy()
-        
-        # Background setup
+            
+        # Sesuaikan ukuran jendela
         screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenheight()
+        screen_height = self.root.winfo_screenheight() 
         
-        self.bg_image = Image.open("12.png")
+        # Hitung 100% dari lebar dan tinggi layar
+        window_width = int(screen_width * 1)
+        window_height = int(screen_height * 1)
+        
+        self.root.geometry(f"{window_width}x{window_height}")
+        
+        # Load gambar
+        self.bg_image= Image.open("12.png")  # Ganti dengan path gambar Anda
         self.bg_image = self.bg_image.resize((screen_width, screen_height), Image.Resampling.LANCZOS)
         self.bg_image_tk = ImageTk.PhotoImage(self.bg_image)
         
+        # Buat canvas untuk menampilkan gambar latar belakang
         self.canvas = tk.Canvas(self.root, width=screen_width, height=screen_height)
         self.canvas.pack(fill="both", expand=True)
+
+        # Tambahkan gambar latar belakang ke canvas
         self.canvas.create_image(0, 0, image=self.bg_image_tk, anchor="nw")
      
-        # Login and Signup Buttons
-        login_button = tk.Button(self.root, text="Log In", 
+        # Log In Button
+        login_button = tk.Button(self.root, text="Log In Now", 
                                  command=self.show_login_page,
                                  font=("Helvetica", 14), 
                                  bg="#4CAF50", fg="white", 
                                  relief=tk.FLAT, 
-                                 padx=20, pady=10)
+                                 padx=5, pady=5)
         login_button.place(x=screen_width//2 - 150, y=screen_height//2)
 
-        signup_button = tk.Button(self.root, text="Sign Up", 
+        # Sign Up Button
+        signup_button = tk.Button(self.root, text="Sign Up Now", 
                                   command=self.show_register_page,
                                   font=("Helvetica", 14), 
                                   bg="#2196F3", fg="white", 
                                   relief=tk.FLAT, 
-                                  padx=20, pady=10)
+                                  padx=5, pady=5)
         signup_button.place(x=screen_width//2 + 50, y=screen_height//2)
 
     def show_login_page(self):
@@ -53,21 +71,25 @@ class AuthApp:
         for widget in self.root.winfo_children():
             widget.destroy()
         
-        # Background setup similar to main page
+        # Sesuaikan ukuran jendela
         screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenheight()
+        screen_height = self.root.winfo_screenheight() 
         
-        self.bg_image = Image.open("19.png")
+        # Load gambar
+        self.bg_image= Image.open("19.png")  # Ganti dengan path gambar Anda
         self.bg_image = self.bg_image.resize((screen_width, screen_height), Image.Resampling.LANCZOS)
         self.bg_image_tk = ImageTk.PhotoImage(self.bg_image)
         
+        # Buat canvas untuk menampilkan gambar latar belakang
         self.canvas = tk.Canvas(self.root, width=screen_width, height=screen_height)
         self.canvas.pack(fill="both", expand=True)
+
+        # Tambahkan gambar latar belakang ke canvas
         self.canvas.create_image(0, 0, image=self.bg_image_tk, anchor="nw")
         
         # Main frame
-        main_frame = tk.Frame(self.root, bg="#17224d", relief=tk.RAISED)
-        main_frame.place(relx=0.5, rely=0.5, anchor='center', width=400, height=400)
+        main_frame = tk.Frame(self.root, bg="#17224d", relief=tk.RAISED)  # Tambahkan border untuk memperjelas
+        main_frame.place(relx=0.5, rely=0.5, anchor='center', width=400, height=400)  # Atur posisi dan ukuran frame
 
         # Back Button
         back_button = tk.Button(main_frame, text="← Back", 
@@ -124,48 +146,48 @@ class AuthApp:
                          relief=tk.FLAT, padx=20, pady=10)
         login_button.pack(fill='x', pady=10)         
 
-    def login_user(self):
+    def go_to_dashboard_from_login(self):
         username = self.login_username.get()
         password = self.login_password.get()
 
         try:
             with open(self.users_file, "r") as f:
                 users = json.load(f)
-                
-                
+
             if username in users and users[username] == password:
-                messagebox.showinfo("Success", "Login successful!")
-                self.root.destroy()  # Close authentication window
-                root_dashboard = tk.Tk()
-                cbcb1.DashboardApp(root_dashboard, username)  # Inisialisasi DashboardApp
-                root_dashboard.mainloop()
+                self.root.destroy()
+                dashboard_root = tk.Tk()
+                DashboardApp(dashboard_root, username)
+                dashboard_root.mainloop()
             else:
                 messagebox.showerror("Error", "Invalid username or password!")
-
         except FileNotFoundError:
-            messagebox.showerror("Error", "User database not found. Please register first.")
-
+            messagebox.showerror("Error", "User  database not found. Please register first.")
 
     def show_register_page(self):
         # Clear existing widgets
         for widget in self.root.winfo_children():
             widget.destroy()
-        
-        # Background setup similar to main page
+
+        # Sesuaikan ukuran jendela
         screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenheight()
+        screen_height = self.root.winfo_screenheight() 
         
-        self.bg_image = Image.open("19.png")
+        # Load gambar
+        self.bg_image= Image.open("19.png")  # Ganti dengan path gambar Anda
         self.bg_image = self.bg_image.resize((screen_width, screen_height), Image.Resampling.LANCZOS)
         self.bg_image_tk = ImageTk.PhotoImage(self.bg_image)
         
+        # Buat canvas untuk menampilkan gambar latar belakang
         self.canvas = tk.Canvas(self.root, width=screen_width, height=screen_height)
         self.canvas.pack(fill="both", expand=True)
+
+        # Tambahkan gambar latar belakang ke canvas
         self.canvas.create_image(0, 0, image=self.bg_image_tk, anchor="nw")
         
         # Main frame
-        main_frame = tk.Frame(self.root, bg="#17224d", relief=tk.RAISED)
-        main_frame.place(relx=0.5, rely=0.5, anchor='center', width=400, height=400)
+        main_frame = tk.Frame(self.root, bg="#17224d", relief=tk.RAISED)  # Tambahkan border untuk memperjelas
+        main_frame.place(relx=0.5, rely=0.5, anchor='center', width=400, height=400)  # Atur posisi dan ukuran frame
 
         # Back Button
         back_button = tk.Button(main_frame, text="← Back", 
@@ -223,11 +245,15 @@ class AuthApp:
                                     padx=20, pady=10)
         register_button.pack(fill='x', pady=20)
 
+
     def register_user(self):
         username = self.reg_username.get()
         password = self.reg_password.get()
 
+        # Di sini Anda biasanya akan memeriksa apakah nama pengguna sudah ada dan mengisi kata sandi. Sebagai contoh, kita akan menganggap pendaftaran berhasil jika kedua kolom terisi.
+
         if username and password:
+            # Simpan data pengguna ke file users.json
             try:
                 if os.path.exists(self.users_file):
                     with open(self.users_file, "r") as f:
@@ -238,7 +264,7 @@ class AuthApp:
                 if username in users:
                     messagebox.showerror("Error", "Username sudah terdaftar!")
                 else:
-                    users[username] = password
+                    users[username] = password  # Menyimpan Username dan Password
                     with open(self.users_file, "w") as f:
                         json.dump(users, f)
 
@@ -248,10 +274,20 @@ class AuthApp:
                 messagebox.showerror("Error", f"Error! Terjadi Kesalahan: {e}")
         else:
             messagebox.showerror("Error", "Harap masukkan username dan password dengan benar!")
-def main():
-    root = tk.Tk()
-    app = AuthApp(root)
-    root.mainloop()
 
-if __name__ == '__main__':
-    main()
+    def login_user(self):
+        username = self.login_username.get()
+        password = self.login_password.get()
+
+        # Validate login
+        try:
+            with open(self.users_file, "r") as f:
+                users = json.load(f)
+
+            if username in users and users[username] == password:
+                messagebox.showinfo("Success", "Login successful!")
+                self.go_to_dashboard_from_login()  # Redirect to dashboard
+            else:
+                messagebox.showerror("Error", "Invalid username or password!")
+        except FileNotFoundError:
+            messagebox.showerror("Error", "Database pengguna tidak ditemukan. Harap Sign In terlebih dahulu.!")

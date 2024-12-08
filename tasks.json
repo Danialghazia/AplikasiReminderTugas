@@ -5,7 +5,7 @@
         "deskripsi": "Sistem Organ",
         "tenggat": "2024-12-09",
         "prioritas": "Tinggi",
-        "progress": 35
+        "progress": 60
     },
     {
         "username": "Danial",
@@ -22,5 +22,13 @@
         "tenggat": "2024-12-31",
         "prioritas": "Tinggi",
         "progress": 56
+    },
+    {
+        "username": "Luthfia",
+        "matkul": "Kalkulus",
+        "deskripsi": "Integral",
+        "tenggat": "2024-12-09",
+        "prioritas": "Sedang",
+        "progress": 100
     }
 ]

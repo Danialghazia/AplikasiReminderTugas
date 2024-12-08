@@ -29,7 +29,7 @@ class UserAuthApp:
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight() 
         
-        # Hitung 90% dari lebar dan tinggi layar
+        # Hitung 100% dari lebar dan tinggi layar
         window_width = int(screen_width * 1)
         window_height = int(screen_height * 1)
         
