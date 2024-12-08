@@ -23,7 +23,14 @@ Aplikasi yang berfungsi sebagai reminder tugas atau pekerjaan yang sedang atau a
 # Site Map
 ![Site Map](https://github.com/user-attachments/assets/6cbb5a2a-ceb1-4815-a782-3ba3bab21b41)
 
-# Diagram Alir
+# Flowchart
+![Flowchart drawio](https://github.com/user-attachments/assets/5d50d945-b61d-4ad7-a1b8-c017be748293)
+
+# Flowchart Revisi 1
+![Flowchart new](https://github.com/user-attachments/assets/5b050668-dab6-4496-a826-42ae485f6302)
+
+
+# Flowchart Fix
 ![Flowchart fix (2)](https://github.com/user-attachments/assets/7005a8ff-97a5-429b-8893-3842dfcb3c59)
 
 
