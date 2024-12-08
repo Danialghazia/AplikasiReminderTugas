@@ -20,6 +20,15 @@ Aplikasi yang berfungsi sebagai reminder tugas atau pekerjaan yang sedang atau a
 6. Aplikasi ini dapat menambahkan materi rangkuman untuk menunjang pengerjaan tugas yang di input.
 7. Aplikasi dapat menampilkan riwayat tugas yang sudah diselesaikan pengguna ataupun ketika tugas telah selesai dikerjakan
 
+# Library
+1.Tkinter
+2.Datetime
+3.Tkcalendar
+4.Threading
+5.Time
+6.Pillow
+7.OS
+
 # Site Map
 ![Site Map](https://github.com/user-attachments/assets/6cbb5a2a-ceb1-4815-a782-3ba3bab21b41)
 
