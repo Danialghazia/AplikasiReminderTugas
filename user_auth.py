@@ -9,9 +9,8 @@ import os
 from tkinter import Canvas
 from PIL import Image, ImageTk  
 from dashboard import DashboardApp
-
+ 
 class UserAuthApp:
-    
     def __init__(self, root):
         self.root = root
         self.root.title("   ")
@@ -149,7 +148,7 @@ class UserAuthApp:
     def go_to_dashboard_from_login(self):
         username = self.login_username.get()
         password = self.login_password.get()
-
+        x = 0
         try:
             with open(self.users_file, "r") as f:
                 users = json.load(f)
@@ -157,7 +156,7 @@ class UserAuthApp:
             if username in users and users[username] == password:
                 self.root.destroy()
                 dashboard_root = tk.Tk()
-                DashboardApp(dashboard_root, username)
+                DashboardApp(dashboard_root, username, x)
                 dashboard_root.mainloop()
             else:
                 messagebox.showerror("Error", "Invalid username or password!")

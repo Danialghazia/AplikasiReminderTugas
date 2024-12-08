@@ -35,8 +35,8 @@ class AplikasiPengingatTugas:
         self.muat_tugas()
         self.siapkan_antarmuka()
         
-        self.thread_pengingat = threading.Thread(target=self.cek_pengingat, daemon=True)
-        self.thread_pengingat.start()
+        # self.thread_pengingat = threading.Thread(target=self.cek_pengingat, daemon=True)
+        # self.thread_pengingat.start()
         
       
     def siapkan_antarmuka(self):
@@ -161,8 +161,9 @@ class AplikasiPengingatTugas:
         
     def kembali_ke_dashboard(self):
         self.akar.destroy()
+        x = 1
         root_dashboard = tk.Tk()
-        dash.DashboardApp(root_dashboard, self.username)  
+        dash.DashboardApp(root_dashboard, self.username, x)  
         root_dashboard.mainloop()    
 
 

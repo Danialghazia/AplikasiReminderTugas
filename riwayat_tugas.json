@@ -9,34 +9,18 @@
     },
     {
         "username": "Fadzli",
-        "matkul": "Bio",
-        "deskripsi": "ppt",
-        "tenggat": "2024-12-20",
-        "prioritas": "Sedang",
-        "progress": 100
-    },
-    {
-        "username": "Fadzli",
-        "matkul": "Bio",
-        "deskripsi": "ppt",
-        "tenggat": "2024-12-20",
-        "prioritas": "Sedang",
-        "progress": 100
-    },
-    {
-        "username": "Fadzli",
-        "matkul": "BIO",
-        "deskripsi": "PPT",
-        "tenggat": "2024-12-19",
-        "prioritas": "Sedang",
-        "progress": 100
-    },
-    {
-        "username": "Fadzli",
-        "matkul": "mtk",
-        "deskripsi": "mtk",
+        "matkul": "ips",
+        "deskripsi": "sejarah",
         "tenggat": "2024-12-18",
         "prioritas": "Sedang",
+        "progress": 100
+    },
+    {
+        "username": "Fadzli",
+        "matkul": "Ekologi Industri",
+        "deskripsi": "Makalah ",
+        "tenggat": "2024-12-19",
+        "prioritas": "Tinggi",
         "progress": 100
     }
 ]

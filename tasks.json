@@ -1,18 +1,10 @@
 [
     {
         "username": "Fadzli",
-        "matkul": "ips",
-        "deskripsi": "sejarah",
-        "tenggat": "2024-12-18",
+        "matkul": "mtk",
+        "deskripsi": "ppt",
+        "tenggat": "2024-12-24",
         "prioritas": "Sedang",
-        "progress": 69
-    },
-    {
-        "username": "Fadzli",
-        "matkul": "ipa",
-        "deskripsi": "bio",
-        "tenggat": "2024-12-26",
-        "prioritas": "Tinggi",
-        "progress": 45
+        "progress": 35
     }
 ]

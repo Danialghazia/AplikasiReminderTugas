@@ -8,15 +8,14 @@ from tkinter import ttk, messagebox
 from tkinter import ttk, messagebox, simpledialog, scrolledtext 
 
 class DashboardApp:
-    def __init__(self, root, username):
+    def __init__(self, root, username, x):
         self.root = root
         self.username = username
         self.root.title(f"Dashboard - {username}")
         self.root.geometry("400x500")
-        
-        self.create_dashboard()
+        self.create_dashboard(x)
 
-    def create_dashboard(self):
+    def create_dashboard(self, x):
         # Clear existing widgets
         
         for widget in self.root.winfo_children():
@@ -73,24 +72,24 @@ class DashboardApp:
         logout_button = ttk.Button(self.root, text="Logout", command=self.logout)
         logout_button.place(relx=0.5, rely=0.85, anchor='center', width=100, height=50)  # Center the frame
 
-        try:
-            with open("tasks.json", "r") as f:
-                tasks = json.load(f)
-                
-                # Filter tasks for current user
-                tasks = [
-                    task for task in tasks
-                    if task.get('username', '') == self.username
-                ]
-                
-                for i in range(0, len(tasks)):
-                    messagebox.showinfo("Reminder", f"Mata kuliah: {tasks[i]["matkul"]}\nDeskripsi: {tasks[i]["deskripsi"]}\nPrioritas: {tasks[i]["prioritas"]}\nTenggat: {tasks[i]["tenggat"]}\nProgress: {tasks[i]["progress"]} %")
+        if x == 0:
+            try:
+                with open("tasks.json", "r") as f:
+                    tasks = json.load(f)
                     
-        except FileNotFoundError:
-            messagebox.showinfo("Info", "Belum ada tugas!")
+                    # Filter tasks for current user
+                    tasks = [
+                        task for task in tasks
+                        if task.get('username', '') == self.username
+                    ]
+                    
+                    for i in range(0, len(tasks)):
+                        messagebox.showinfo("Reminder", f"Mata kuliah: {tasks[i]["matkul"]}\nDeskripsi: {tasks[i]["deskripsi"]}\nPrioritas: {tasks[i]["prioritas"]}\nTenggat: {tasks[i]["tenggat"]}\nProgress: {tasks[i]["progress"]} %")
+            except FileNotFoundError:
+                messagebox.showinfo("Info", "Belum ada tugas!")
             
     def open_add_task(self):
-        self.root.deiconify()
+        self.root.destroy()
         root_task = tk.Tk()
         root_task.attributes('-fullscreen', True)
         root_task.overrideredirect(True)
@@ -100,6 +99,7 @@ class DashboardApp:
     
     def open_task_list(self):
         # Create a new window to show task list
+        self.root.withdraw()
         task_list_window = tk.Toplevel(self.root)
         task_list_window.title("Daftar Tugas")
         screen_width = task_list_window.winfo_screenwidth()
@@ -109,9 +109,13 @@ class DashboardApp:
         task_list_window.geometry(f"{window_width}x{window_height}")
         task_list_window.configure(bg="#17224d") 
         
+        def back_dashboard():
+            task_list_window.destroy()
+            self.root.deiconify()
+        
         # Create Back Button
         back_button = ttk.Button(task_list_window, text="Kembali ke Dashboard", 
-                                command=task_list_window.destroy)
+                                command=back_dashboard)
         back_button.pack(pady=10)
         
         # Sorting Frame
@@ -315,6 +319,7 @@ class DashboardApp:
 
     def open_task_history(self):
         # Create a new window to show task history
+        self.root.withdraw()
         task_history_window = tk.Toplevel(self.root)
         screen_width = task_history_window.winfo_screenwidth()
         screen_height = task_history_window.winfo_screenheight()
@@ -324,9 +329,13 @@ class DashboardApp:
         task_history_window.title("Riwayat Tugas")
         task_history_window.configure(bg='#17224d')
         
+        def back_dashboard():
+            task_history_window.destroy()
+            self.root.deiconify()
+        
         # Create Back Button
         back_button = ttk.Button(task_history_window, text="Kembali ke Dashboard", 
-                                command=task_history_window.destroy)
+                                command=back_dashboard)
         back_button.pack(pady=10)
         
         # Create Treeview to show task history
@@ -363,6 +372,7 @@ class DashboardApp:
 
     def open_task_summary(self):
         # Create a new window to add task summary
+        self.root.withdraw()
         summary_window = tk.Toplevel(self.root)
         screen_width = summary_window.winfo_screenwidth()
         screen_height = summary_window.winfo_screenheight()
@@ -372,9 +382,13 @@ class DashboardApp:
         summary_window.title("Tambah Rangkuman Tugas")
         summary_window.configure(bg='#17224d')
         
+        def back_dashboard():
+            summary_window.destroy()
+            self.root.deiconify()
+        
         # Create Back Button
         back_button = ttk.Button(summary_window, text="Kembali ke Dashboard", 
-                                command=summary_window.destroy)
+                                command=back_dashboard)
         back_button.pack(pady=10)
         
         # Create Treeview to show tasks for summary
