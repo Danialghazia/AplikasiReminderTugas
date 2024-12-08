@@ -46,10 +46,15 @@ Aplikasi yang berfungsi sebagai reminder tugas atau pekerjaan yang sedang atau a
 # Deskripsi Flowchart
 Diagram alir di atas menjelaskan bagaimana alur kerja dari sebuah Aplikasi Pengingat Tugas yang bernama "Remind Me". Ketika pengguna menjalankan aplikasi ini, program akan mengarahkan pengguna ke Halaman Register. Jika pengguna belum memiliki akun, pengguna diwajibkan melakukan Sign Up atau membuat akun terlebih dahulu dengan mengisi username dan password. Setelah registrasi berhasil, pengguna menuju ke halaman login untuk mengakses akun yang sudah terdaftar dengan mengisi username dan password. Jika berhasil login, program mengarahkan pengguna menuju halaman dashboard yang berisi 4 menu utama, yang berarti data pengguna sudah terbaca di database json. Dan jika tidak berhasil login, berarti username atau password yang diinput pengguna tidak sesuai atau terdaftar pada database.
 Pada menu dashboard terdiri 4 menu utama, yaitu : 
+
 1.Tambah tugas : Pada menu ini pengguna ditampilkan halaman untuk menginput data tugas. Pengguna dapat menginput tugas dengan mengisi (matkul, deskripsi tugas, tenggat waktu, prioritas tugas yang terdiri dari rendah; sedang; dan tinggi, dan progress tugas. Setelah menambahkan tugas, tugas berhasil disimpan di database. Jika ingin keluar dari menu halaman tambah tugas, pengguna bisa menekan tombol “kembali ke dashboard” dan jika tidak ingin keluar dari menu, maka pengguna masih berada di tampilan halaman menu tambah tugas. 
+
 2.Daftar tugas : Pada menu ini pengguna diperlihatkan daftar tugas yang sudah diinput sebelumnya di menu daftar tugas. Selain itu, pengguna juga bisa menyortir tugas mereka berdasarkan skala prioritas, deadline, dan progress tugas. Pengguna juga bisa memperbarui progress tugas dan menghapus tugas yang ingin dihapus. Jika ingin keluar dari menu daftar tugas, pengguna bisa menekan tombol “kembali ke dashboard” dan jika tidak ingin keluar dari menu, maka pengguna masih berada di tampilan halaman menu daftar tugas. 
+
 3.Riwayat tugas : Pada menu ini pengguna diperlihatkan tampilan daftar status tugas yang sudah selesai berdasarkan progress tugas 100% dan status tugas yang sudah melewati deadline. 
+
 4.Tambah rangkuman : Pada menu ini pengguna diperlihatkan tampilan untuk menginput rangkuman dengan memilih tugas yang ada. Tambah rangkuman di sini berfungsi agar jika kita menambahkan tugas bisa menambahkan materi dari tugas tersebut. Setelah menambahkan rangkuman tugas, tugas berhasil disimpan di database. Jika ingin keluar dari menu halaman tambah rangkuman, pengguna bisa menekan tombol “kembali ke dashboard” dan jika tidak ingin keluar dari menu, maka pengguna masih berada di tampilan halaman menu tambah rangkuman. 
+
 Jika sudah tidak ada menu yang dipilih, maka pengguna bisa menekan button logout untuk keluar dari program tersebut. 
 
 
