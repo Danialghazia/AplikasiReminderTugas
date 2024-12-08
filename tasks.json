@@ -1,10 +1,42 @@
 [
     {
         "username": "Fadzli",
-        "matkul": "mtk",
-        "deskripsi": "ppt",
-        "tenggat": "2024-12-24",
+        "matkul": "Kimia",
+        "deskripsi": "Cheat sheet",
+        "tenggat": "2024-12-31",
+        "prioritas": "Tinggi",
+        "progress": 60
+    },
+    {
+        "username": "Fadzli",
+        "matkul": "Agama",
+        "deskripsi": "Bikin makalah dan video",
+        "tenggat": "2025-01-01",
         "prioritas": "Sedang",
-        "progress": 35
+        "progress": 88
+    },
+    {
+        "username": "Fadzli",
+        "matkul": "Ekologi Industri",
+        "deskripsi": "Buat makalah",
+        "tenggat": "2024-12-25",
+        "prioritas": "Rendah",
+        "progress": 20
+    },
+    {
+        "username": "Fadzli",
+        "matkul": "Fisika",
+        "deskripsi": "Spada",
+        "tenggat": "2024-12-27",
+        "prioritas": "Sedang",
+        "progress": 10
+    },
+    {
+        "username": "Fadzli",
+        "matkul": "PTI",
+        "deskripsi": "Bikin PPT",
+        "tenggat": "2024-12-28",
+        "prioritas": "Sedang",
+        "progress": 15
     }
 ]

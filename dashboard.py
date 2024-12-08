@@ -153,6 +153,8 @@ class DashboardApp:
                 ]
                 
                 def sort_tasks(tasks, sort_by):
+                    with open("tasks.json", "r") as f:
+                        tasks = json.load(f)
                     def prioritas_key(task):
                         prioritas_map = {'Tinggi': 1, 'Sedang': 2, 'Rendah': 3}
                         return prioritas_map.get(task['prioritas'], 4)
@@ -298,24 +300,6 @@ class DashboardApp:
         delete_button = tk.Button(task_list_window, text="Hapus Tugas", command=delete_task, bg='#d20505', fg='white')
         delete_button.pack(pady=10)
 
-        # Optional: You can also add a refresh button to reload tasks from the file
-        def refresh_tasks():
-            # Clear existing items in the treeview
-            for item in tree.get_children():
-                tree.delete(item)
-
-            # Load tasks again
-            try:
-                with open("tasks.json", "r") as f:
-                    tasks = json.load(f)
-                    for task in tasks:
-                        tree.insert('', 'end', values=(
-                            task['matkul'], task['deskripsi'], task['tenggat'], 
-                            task['prioritas'], f"{task['progress']}%"
-                        ))
-            except FileNotFoundError:
-                messagebox.showinfo("Info", "Tidak ada tugas yang tersedia.")
-
 
     def open_task_history(self):
         # Create a new window to show task history
@@ -392,7 +376,7 @@ class DashboardApp:
         back_button.pack(pady=10)
         
         # Create Treeview to show tasks for summary
-        columns = ('Mata Kuliah', 'Deskripsi', 'Tenggat', 'Prioritas', 'Rangkuman')
+        columns = ('Mata Kuliah', 'Deskripsi', 'Tenggat', 'Prioritas')
         tree = ttk.Treeview(summary_window, columns=columns, show='headings')
         
         for col in columns:
