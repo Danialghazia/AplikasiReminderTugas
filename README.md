@@ -43,6 +43,10 @@ Aplikasi yang berfungsi sebagai reminder tugas atau pekerjaan yang sedang atau a
 # Flowchart Fix
 ![Flowchart fix (3)](https://github.com/user-attachments/assets/ab071d32-794d-4f44-b34b-95640d021fae)
 
+# Revisi Flowchart Fix
+![Flowchart (1)](https://github.com/user-attachments/assets/63bb15cc-5e6e-4f96-b623-7c585f38cf46)
+
+
 # Deskripsi Flowchart
 Diagram alir di atas menjelaskan bagaimana alur kerja dari sebuah Aplikasi Pengingat Tugas yang bernama "Remind Me". Ketika pengguna menjalankan aplikasi ini, program akan mengarahkan pengguna ke Halaman Register. Jika pengguna belum memiliki akun, pengguna diwajibkan melakukan Sign Up atau membuat akun terlebih dahulu dengan mengisi username dan password. Setelah registrasi berhasil, pengguna menuju ke halaman login untuk mengakses akun yang sudah terdaftar dengan mengisi username dan password. Jika berhasil login, program mengarahkan pengguna menuju halaman dashboard yang berisi 4 menu utama, yang berarti data pengguna sudah terbaca di database json. Dan jika tidak berhasil login, berarti username atau password yang diinput pengguna tidak sesuai atau terdaftar pada database.
 Pada menu dashboard terdiri 4 menu utama, yaitu : 
